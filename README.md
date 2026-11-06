@@ -1,498 +1,778 @@
 # 🧠 User Feedback Synthesizer — Feedback Intelligence Agent
 
-> An AI product analyst that **remembers** customer feedback, understands how it **changes over time**, and helps product teams make better decisions.
+> An AI-powered customer feedback intelligence platform that **remembers** historical context across product iterations, tracks how customer sentiment **evolves over time**, and delivers **evidence-backed product recommendations**.
 
-![Status](https://img.shields.io/badge/status-MVP%20%2F%20Ideathon-blue)
-![Version](https://img.shields.io/badge/version-1.0-green)
+![Status](https://img.shields.io/badge/status-Active%20Development%20(Phase%204.1%20Completed)-blue)
+![Python](https://img.shields.io/badge/python-3.11%2B-brightgreen)
 ![Backend](https://img.shields.io/badge/backend-FastAPI-009688)
-![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20Vite-61DAFB)
-![DB](https://img.shields.io/badge/database-PostgreSQL-336791)
-![Memory](https://img.shields.io/badge/memory-Hindsight-purple)
-![LLM](https://img.shields.io/badge/LLM-Gemini-orange)
+![Database](https://img.shields.io/badge/database-PostgreSQL%20%2F%20SQLAlchemy%202.x-336791)
+![Migrations](https://img.shields.io/badge/migrations-Alembic-orange)
+![Tests](https://img.shields.io/badge/tests-88%20passing%20(pytest)-success)
+![AI Providers (Planned)](https://img.shields.io/badge/AI%20Providers-Gemini%20%7C%20OpenRouter%20%7C%20xAI%20Grok-purple)
+![Memory (Planned)](https://img.shields.io/badge/memory-Hindsight-informational)
 
 ---
 
 ## 📑 Table of Contents
 
-1. [Overview](#-overview)
-2. [The Problem](#-the-problem)
-3. [Key Features](#-key-features)
+1. [Project Overview](#-project-overview)
+2. [The Problem It Solves](#-the-problem-it-solves)
+3. [Implemented vs. Planned Capabilities](#-implemented-vs-planned-capabilities)
 4. [System Architecture](#-system-architecture)
-5. [Hindsight Memory Layer](#-hindsight-memory-layer)
-6. [Tech Stack](#-tech-stack)
-7. [Database Schema](#-database-schema)
-8. [API Reference](#-api-reference)
-9. [Project Structure](#-project-structure)
-10. [Getting Started](#-getting-started)
-11. [Demo Scenario](#-demo-scenario)
-12. [Edge Cases & Reliability](#-edge-cases--reliability)
-13. [MVP Roadmap](#-mvp-roadmap)
-14. [Success Metrics](#-success-metrics)
-15. [Future Scope](#-future-scope)
-16. [Contributing](#-contributing)
+5. [Multi-Provider AI Architecture (Planned)](#-multi-provider-ai-architecture-planned)
+6. [Hindsight Memory Layer (Planned)](#-hindsight-memory-layer-planned)
+7. [Technology Stack](#-technology-stack)
+8. [Database Schema & Data Models](#-database-schema--data-models)
+9. [Feedback Ingestion & Quality Control Pipeline](#-feedback-ingestion--quality-control-pipeline)
+10. [API Reference](#-api-reference)
+11. [Repository Structure](#-repository-structure)
+12. [Getting Started & Local Setup](#-getting-started--local-setup)
+13. [Running Automated Tests](#-running-automated-tests)
+14. [Edge Cases & Reliability](#-edge-cases--reliability)
+15. [Development Roadmap](#-development-roadmap)
+16. [Author & License](#-author--license)
 
 ---
 
-## 🔭 Overview
+## 🔭 Project Overview
 
-**User Feedback Synthesizer** collects customer feedback from multiple sources, cleans and standardises it, identifies themes and sentiment, and stores everything in PostgreSQL. What makes it different is a **long-term memory layer (Hindsight)**: when new feedback arrives, the agent retrieves what customers said before, compares patterns across time, and links feedback trends to product releases.
+**User Feedback Synthesizer – Feedback Intelligence Agent** transforms raw, multi-source customer feedback into continuous, historical, evidence-backed product intelligence.
 
-| Traditional feedback tools | This platform |
-|---|---|
-| Analyse feedback in isolation | Remembers historical feedback |
-| Show what customers say *now* | Shows how concerns *evolve* |
-| Charts without context | Evidence-backed recommendations |
-| No link to product decisions | Correlates feedback with releases |
+Standard feedback analytics tools evaluate customer input as isolated, point-in-time snapshots. When users report issues, teams see aggregate complaint counts for the current sprint, but lose context on whether an issue is recurring, worsening, or previously resolved.
 
-**Core innovation:** Persistent memory + temporal feedback intelligence + product change correlation + evidence-backed recommendations.
+This platform bridges that gap by combining:
+- **Strict Ingestion & Quality Control:** Deterministic ingestion, schema validation, intra-batch and database deduplication, multilingual normalization, PII sanitization, and spam detection.
+- **Relational Source of Truth:** A structured PostgreSQL schema capturing feedback, upload jobs, themes, aspect sentiment, snapshots, releases, and insight evidence.
+- **Multi-Provider AI Intelligence (Planned):** Orchestrated inference across Google Gemini, OpenRouter, and direct xAI Grok with automated fallback and structured output contracts.
+- **Persistent Contextual Memory via Hindsight (Planned):** Long-term episodic, semantic, and temporal reasoning that connects current feedback to historical patterns and specific product releases.
+
+```
+Raw Customer Feedback (CSV / JSON / Reviews / Tickets)
+                      │
+                      ▼
+┌────────────────────────────────────────────────────────┐
+│     Feedback Ingestion & Quality Control Pipeline      │
+│  Validation ──► Dedup ──► Normalization ──► PII Scrub  │
+└────────────────────────────────────────────────────────┘
+                      │
+                      ▼
+┌────────────────────────────────────────────────────────┐
+│         Structured PostgreSQL Source of Truth          │
+│   Feedback (Immutable) │ Upload Jobs │ Themes │ Links  │
+└────────────────────────────────────────────────────────┘
+                      │
+                      ▼
+┌────────────────────────────────────────────────────────┐
+│    Feedback Intelligence Agent (Multi-Provider AI)     │
+│  Gemini (Primary) ──► OpenRouter ──► Grok (xAI Direct) │
+└────────────────────────────────────────────────────────┘
+                      │
+                      ▼
+┌────────────────────────────────────────────────────────┐
+│          Hindsight Long-Term Memory Layer              │
+│    Episodic Memory │ Semantic Trends │ Temporal Diffs  │
+└────────────────────────────────────────────────────────┘
+                      │
+                      ▼
+Evidence-Backed Product Recommendations & Interactive Analytics
+```
 
 ---
 
-## ❗ The Problem
+## ❗ The Problem It Solves
 
-Product teams receive feedback through app reviews, support tickets, surveys, emails, and social platforms, but:
+Modern product teams collect customer feedback from disparate channels—app store reviews, Zendesk support tickets, in-app surveys, customer interviews, and social media. However:
 
-- Feedback is scattered across platforms.
-- Repeated complaints are hard to spot over time.
-- Emerging problems are hard to separate from recurring ones.
-- Sentiment changes are not consistently tracked.
-- Product improvements are not compared with later feedback.
-- Historical feedback is forgotten or analysed separately.
-- Teams lack evidence for product decisions.
+1. **Fragmented Channels:** Feedback is siloed across separate tools with incompatible schemas and varying data quality.
+2. **Loss of Historical Context:** Teams repeatedly investigate recurring issues because past customer complaints and bug reports are forgotten across planning cycles.
+3. **Emerging vs. Chronic Confusion:** It is difficult to separate brand-new bugs introduced by recent deployments from persistent, low-grade background dissatisfaction.
+4. **Unverifiable AI Summaries:** Generic LLM dashboards often hallucinate trends or summarize feedback without linking back to traceable customer records.
+5. **No Direct Correlation with Releases:** Teams cannot easily measure whether a product update actually resolved targeted customer pain points without manual post-mortems.
+
+**Core Value Proposition:** Move from *collecting* customer feedback to *continuously learning* from it with mathematical evidence, historical continuity, and data immutability.
 
 ---
 
-## ✨ Key Features
+## ✨ Implemented vs. Planned Capabilities
 
-- **Multi-source ingestion** — CSV / JSON uploads, app reviews, support tickets, surveys.
-- **Data quality pipeline** — validation, UTC timestamp normalisation, deduplication, PII redaction, idempotent imports.
-- **AI classification** — topic, feature, sentiment, intensity, pain point, intent, keywords, confidence. Supports **multiple themes per feedback** with **aspect-level sentiment**.
-- **Theme discovery** — semantic grouping, recurring / emerging / declining / resolved status, manual merge and correction.
-- **Sentiment trend tracking** — daily, weekly, monthly; feature-level; filters out low-volume noise.
-- **Emerging theme detection** — compares recent feedback to historical patterns with minimum-evidence thresholds.
-- **Product change correlation** — before/after release comparison using *"associated with"* language (never claims causation).
-- **Evidence-backed insights** — every insight links to source feedback, shows confidence and time period.
-- **Hindsight memory** — episodic, semantic and temporal memory with traceable source IDs.
-- **AI research chat** — ask questions like *"Have customers complained about checkout before?"*
+To provide complete transparency between active code and future roadmap items:
 
-> **Principle:** The LLM *explains* calculated results — it never invents metrics. All counts, percentages and comparisons come from PostgreSQL.
+### ✅ Genuinely Implemented & Tested Capabilities
+
+| Capability | Module | Description & Status |
+| :--- | :--- | :--- |
+| **FastAPI Backend Core** | `backend/app/` | Lifespan application factory, centralized Pydantic v2 settings, structured logging, and unified exception handling. |
+| **Health & Readiness API** | `backend/app/api/routes/health.py` | `GET /` and `GET /api/health` providing database connectivity status and dependency readiness. |
+| **Relational Data Layer** | `backend/app/models/` | 9 SQLAlchemy 2.x relational tables covering all 8 core entities with UUID PKs, UTC timestamps, and explicit constraints. |
+| **Alembic Migrations** | `backend/alembic/` | 5 chained revisions (`ae66156cfb1a` → `b702ef22d23b` → `c3f912b4e87a` → `e5a8f23c91d4` → `f6b903e1a82d`). |
+| **Feedback Ingestion** | `backend/app/services/feedback_ingestion.py` | Multipart CSV (`utf-8`, `utf-8-sig`) and JSON array ingestion with strict timestamp validation. |
+| **Upload Job Tracking** | `backend/app/models/upload_job.py` | `UploadJob` lifecycle tracking (`pending`, `processing`, `completed`, `completed_with_errors`, `failed`) with row error recording. |
+| **Deduplication Engine** | `backend/app/services/feedback_ingestion.py` | Two-tier deduplication: intra-batch SHA-256 content hashing and database index-assisted lookup on `(product, timestamp)`. |
+| **Ingestion Safeguards** | `backend/app/core/config.py` | Hard limits: 10 MB maximum file size, 10,000 records per upload, 10,000 characters per feedback item. |
+| **Feedback Immutability** | `backend/app/models/feedback.py` | Original customer input (`feedback_text`) is strictly read-only; processed data is stored in `cleaned_feedback_text`. |
+| **Text Normalization** | `backend/app/services/text_normalization.py` | Unicode NFC normalization, CRLF to LF, whitespace collapsing, emoji preservation, and code syntax preservation. |
+| **PII Detection & Redaction**| `backend/app/services/pii_detector.py` | Redacts emails, international phones (US, UK, FR, DE, IN), IPv4 addresses, URLs (preserving debug paths), and SSN/card patterns. |
+| **Spam & Noise Detection** | `backend/app/services/spam_detector.py` | Identifies empty strings, repeated characters, spam keywords, URL-only text, and short strings (preserving non-Latin alphabets). |
+| **Transparent Quality Scoring** | `backend/app/services/quality_scorer.py` | Decoupled `content_quality_score` and `metadata_completeness_score` (0.0 to 100.0) with guaranteed sentiment neutrality. |
+| **Batch Row-Level Locking** | `backend/app/services/feedback_cleaning.py` | PostgreSQL `SELECT ... FOR UPDATE SKIP LOCKED` for concurrent workers with fallback for SQLite testing. |
+| **Automated Test Suite** | `backend/tests/` | 88 automated pytest unit and integration tests passing with 100% pass rate. |
+
+### ⏳ Planned Capabilities (In Active Design & Development)
+
+- **Multi-Provider AI Orchestration (Part 5 & 5.1):** Dynamic failover across Gemini, OpenRouter, and direct xAI Grok with circuit breakers and retry policies (settings drafted; provider clients and failover orchestration in development).
+- **AI Classification & Sentiment Analysis:** Multi-theme extraction, aspect-based sentiment, pain-point intensity, and customer intent classification via LLM.
+- **Theme Discovery & Trend Engine:** Semantic clustering, recurring/emerging theme flags, sentiment velocity over time, and release before/after correlation.
+- **Hindsight Persistent Memory Integration (Part 9):** Episodic, semantic, and temporal memory synchronization with source ID provenance.
+- **Evidence-Backed Insight Synthesizer:** Rule-governed recommendation engine requiring underlying database citations before generating insights.
+- **Frontend Dashboard:** Interactive user interface built with React, Vite, TailwindCSS, and Plotly visualization.
 
 ---
 
 ## 🏗 System Architecture
 
-![System Architecture](docs/architecture.png)
-
-The MVP is a **modular monolith** (FastAPI backend + React frontend) to keep development simple and the demo easy to run.
-
-### Layers
-
-| # | Layer | Components |
-|---|---|---|
-| 1 | **Data Sources** | Surveys & interviews, app reviews, support tickets, Slack / email, CSV / JSON upload |
-| 2 | **Ingestion & Quality Control** | FastAPI ingestion API → format normalisation → validation & missing data → deduplication & spam detection → PII redaction |
-| 3 | **Structured Data Layer** | PostgreSQL — insights & evidence, raw feedback, themes & sentiment, product releases |
-| 4 | **Feedback Intelligence Agent** | Orchestrator → feedback classifier → theme discovery & clustering → emerging theme detection, aspect-based sentiment → temporal trend & anomaly detection → product change correlation → evidence validation → insight synthesiser |
-| 5 | **Hindsight Long-Term Memory** | Memory update & reconciliation, episodic / semantic / temporal memory, memory retrieval |
-| 6 | **Reliability & Governance** | Access control & data retention, retry & error handling, confidence & evidence thresholds |
-| 7 | **Product Intelligence Interface** | AI research chat, memory explorer, executive dashboard, actionable recommendations, theme explorer, sentiment timeline, product impact tracker |
-
-### Data flow
+The platform is designed as a **modular service-oriented architecture** centered around a structured relational database as the authoritative source of truth.
 
 ```mermaid
 flowchart TD
-    A["Feedback Sources"] --> B["FastAPI Ingestion"]
-    B --> C["Validation and Normalisation"]
-    C --> D["Deduplication and PII Redaction"]
-    D --> E["PostgreSQL"]
+    subgraph DataSources["Data Sources (Multi-Channel)"]
+        CSV["CSV Datasets"]
+        JSON["JSON Payloads"]
+        Reviews["App Store / Play Store (Planned)"]
+        Tickets["Support Tickets / CRM (Planned)"]
+    end
 
-    E --> F["AI Agent Orchestrator"]
+    subgraph IngestionLayer["Ingestion & Quality Assurance (Implemented)"]
+        API["FastAPI Ingestion Endpoint"]
+        Val["Strict Schema & Timestamp Validation"]
+        Dedup["Intra-Batch & DB Deduplication"]
+        Clean["Text Normalization & PII Redaction"]
+        Scorer["Spam Check & Quality Scoring"]
+    end
 
-    F --> G["Feedback Classification"]
-    G --> H["Theme and Sentiment Analysis"]
-    H --> I["Trend and Emerging Theme Detection"]
+    subgraph StorageLayer["Authoritative Relational Core (Implemented)"]
+        DB[(PostgreSQL 15+)]
+        FB["Feedback Table (Immutable Raw Text)"]
+        Jobs["Upload Jobs Table"]
+        CleanFB["Cleaned Feedback & Quality Flags"]
+        DB --> FB
+        DB --> Jobs
+        DB --> CleanFB
+    end
 
-    I --> J["Hindsight Memory Retrieval"]
-    J --> K["Historical Pattern Comparison"]
+    subgraph AIOrchestration["AI Intelligence Layer (Planned)"]
+        Router{"AI Provider Router"}
+        Gemini["Google Gemini (Primary)"]
+        OpenRouter["OpenRouter (Secondary Routing)"]
+        Grok["xAI Grok Direct (Tertiary)"]
+        Router -->|1. Try| Gemini
+        Router -->|2. Fallback on 429/5xx| OpenRouter
+        Router -->|3. Fallback on exhaustion| Grok
+    end
 
-    K --> L["Product Change Correlation"]
-    L --> M["Evidence Validation"]
+    subgraph MemoryLayer["Persistent Contextual Memory (Planned)"]
+        Hindsight["Hindsight Engine"]
+        Episodic["Episodic Memory (Events)"]
+        Semantic["Semantic Memory (Themes)"]
+        Temporal["Temporal Memory (Changes Over Time)"]
+        Hindsight --> Episodic
+        Hindsight --> Semantic
+        Hindsight --> Temporal
+    end
 
-    M --> N["AI Insight Generation"]
-    N --> O["Hindsight Memory Update"]
-    N --> P["Dashboard and AI Chat"]
+    subgraph PresentationLayer["Presentation & Exploration (Planned)"]
+        UI["React / Vite Web UI"]
+        Plotly["Plotly Interactive Analytics"]
+        Chat["Memory-Augmented Research Agent"]
+    end
 
-    Q["Product Release Data"] --> L
+    DataSources --> API
+    API --> Val --> Dedup --> Clean --> Scorer --> DB
+    CleanFB -.-> Router
+    Router -.-> Hindsight
+    Hindsight -.-> PresentationLayer
+    DB -.-> PresentationLayer
 ```
 
-### Agent processing flow
+### Architectural Principles
 
-1. Receive and validate feedback.
-2. Store the original record in PostgreSQL.
-3. Classify feedback with the LLM.
-4. Extract themes and sentiment.
-5. Retrieve related memories from Hindsight.
-6. Compare with historical patterns.
-7. Identify recurring or emerging themes.
-8. Check relevant product release information.
-9. Validate all insights against source records.
-10. Generate recommendations.
-11. Update Hindsight with meaningful new knowledge.
-12. Refresh dashboard analytics.
+1. **PostgreSQL Is the Sole Source of Truth:** Neither LLM responses nor external memory services serve as the authoritative store for raw records or analytics metrics. All aggregate statistics are computed directly in SQL.
+2. **Original Data Immutability:** Raw customer feedback is preserved in its exact uploaded form. Normalization, redaction, and classification are persisted in distinct columns.
+3. **Evidence Grounding:** AI insights must explicitly cite source `feedback_id` records. If an insight cannot be substantiated with database records, it is rejected.
+4. **Graceful Degradation:** If AI providers or memory services experience downtime, ingestion, data quality processing, and relational querying continue without disruption.
 
 ---
 
-## 🧠 Hindsight Memory Layer
+## 🤖 Multi-Provider AI Architecture (Planned)
 
-Hindsight is the **long-term memory** of the agent. **PostgreSQL remains the source of truth** — Hindsight stores contextual knowledge and references, not the only copy of business data.
+To ensure uninterrupted intelligence processing under production workloads, the system features a unified multi-provider orchestration strategy:
 
-| Memory type | Stores | Example |
-|---|---|---|
-| **Episodic** | Meaningful individual events | "In Sept 2026, multiple customers reported slow checkout." |
-| **Semantic** | Generalised knowledge from recurring feedback | "Checkout performance is a recurring concern." |
-| **Temporal** | How themes and sentiment change over time | "Checkout complaints declined after the October release." |
+```
+Provider Request Order:
+1. Google Gemini (Primary)
+        │
+        ├── [Quota Exhaustion / Rate Limit 429 / 5xx Error]
+        ▼
+2. OpenRouter (Secondary / Dynamic Multi-Model Routing)
+        │
+        ├── [Provider Outage / Upstream Failure]
+        ▼
+3. xAI Grok Direct API (Tertiary / Fallback)
+```
 
-**Memory rules**
+### Key Components
 
-- Don't store every raw feedback record — store events, patterns and validated insights.
-- Preserve history instead of overwriting it.
-- Retrieve by product, theme, feature and time context.
-- Keep source IDs so memories trace back to original feedback.
-- Validate retrieved memories against current database data before making important claims.
+- **Common Provider Abstraction:** A standard `BaseAIProvider` interface defining uniform signatures for classification, theme extraction, and insight synthesis.
+- **Consistent Structured Response Contracts:** All models produce validated Pydantic schemas using structured outputs or JSON-schema constraints, ensuring field-level predictability regardless of the underlying LLM.
+- **Provider-Specific Error Normalization:** Translates proprietary SDK exceptions into uniform internal error types:
+  - `RateLimitException` (HTTP 429)
+  - `QuotaExceededException` (Billing/exhaustion)
+  - `AuthenticationException` (Invalid credentials)
+  - `ModelUnavailableException` (HTTP 502/503/504)
+- **Bounded Retries with Exponential Backoff:** Configurable transient retry attempts before escalating to the fallback provider.
+- **Provider Cooldown & Circuit Breaking:** Temporarily trips offline providers into a cooling state (e.g., 60 seconds) after consecutive failures, routing traffic directly to the active secondary provider.
+- **Observability & Audit Trails:** Every classification record tracks `ai_provider_used`, `ai_model_name`, `tokens_consumed`, and `latency_ms`.
 
-**If Hindsight is unavailable:** ingestion and basic analytics continue in PostgreSQL, memory-dependent insights are marked *limited*, and memory operations are retried safely.
-
----
-
-## 🧰 Tech Stack
-
-| Component | Technology | Purpose |
-|---|---|---|
-| Frontend | React + Vite | User interface |
-| Backend | Python + FastAPI | API and business logic |
-| LLM | Gemini API | Classification, reasoning, summaries |
-| Memory | Hindsight | Long-term agent memory |
-| Database | PostgreSQL | Structured data and analytics |
-| Visualisation | Plotly | Charts and trends |
-| Similarity | Embeddings | Semantic grouping of feedback |
-| Clustering (optional) | BERTopic | Theme discovery |
-| Deployment | Docker | Packaging |
+> *Note: Settings and schema structures for multi-provider routing are configured in `backend/app/core/config.py`. Provider clients and live failover handlers are currently in development.*
 
 ---
 
-## 🗄 Database Schema
+## 🧠 Hindsight Memory Layer (Planned)
 
-| Table | Purpose | Key fields |
-|---|---|---|
-| `feedback` | Original customer feedback | `feedback_id` (PK), source, customer_id, feedback_text, product, feature, timestamp, app_version, created_at |
-| `themes` | Identified themes | `theme_id` (PK), theme_name, description, category, status, created_at |
-| `feedback_themes` | Feedback ↔ theme mapping (many-to-many) | feedback_id (FK), theme_id (FK), relevance_score, aspect_sentiment |
-| `sentiment_history` | Sentiment results | `sentiment_id` (PK), feedback_id, theme_id, sentiment_label, sentiment_score, confidence_score, analysed_at |
-| `product_changes` | Releases and changes | `release_id` (PK), product, feature, release_description, release_date, version, change_category |
-| `theme_snapshots` | Historical theme metrics | `snapshot_id` (PK), theme_id, period_start, period_end, feedback_count, positive/negative/neutral counts, sentiment_average |
-| `insights` | AI-generated insights | `insight_id` (PK), title, summary, recommendation, confidence_score, status, created_at |
-| `insight_evidence` | Insight ↔ supporting feedback | insight_id (FK), feedback_id (FK), evidence_type |
-| `memory_metadata` | References to Hindsight records | memory_id, memory_type, source_reference, related_theme, created_at, last_updated |
+The integration with **Hindsight** provides the agent with human-like memory across sprint cycles and quarterly product roadmaps.
 
-### Standard feedback format
+| Memory Tier | What It Stores | Example |
+| :--- | :--- | :--- |
+| **Episodic Memory** | Discrete events and significant feedback clusters | *"In October 2026, 42 users reported checkout timeouts after v2.4.0."* |
+| **Semantic Memory** | General synthesized product domain knowledge | *"Checkout performance has historically been a high-churn driver for European users."* |
+| **Temporal Memory** | Trajectory and evolution of customer sentiment over time | *"Complaints regarding payment latency decreased by 68% following the v2.5 release."* |
 
-```json
-{
-  "feedback_id": "FB001",
-  "source": "app_review",
-  "customer_id": "C101",
-  "feedback_text": "Checkout is too slow",
-  "product": "Mobile App",
-  "feature": "Checkout",
-  "timestamp": "2026-11-01T10:30:00Z",
-  "app_version": "2.4.0"
-}
+### Strict Provenance Rules
+- **No Uncurated Memory Ingestion:** Raw feedback is never dumped blindly into long-term memory; only validated themes, verified anomalies, and synthesized milestones are retained.
+- **Bi-directional Provenance:** Every memory entry in PostgreSQL references its upstream `bank_id`, `hindsight_memory_id`, and source entity IDs.
+- **Resilience:** If the Hindsight service is unavailable, core ingestion and relational queries remain fully operational, with memory-dependent insights flagged as *limited context*.
+
+---
+
+## 🧰 Technology Stack
+
+### Backend (Implemented)
+- **Language & Runtime:** Python 3.11+
+- **Web Framework:** FastAPI 0.115+
+- **ASGI Server:** Uvicorn (with standard worker support)
+- **Validation & Settings:** Pydantic v2 & Pydantic Settings
+- **ORM / Database Access:** SQLAlchemy 2.x
+- **Database Driver:** Psycopg 3 (`psycopg[binary]`)
+- **Schema Migrations:** Alembic
+- **Testing:** Pytest, AnyIO, HTTPX (`AsyncClient`)
+
+### Database (Implemented)
+- **Primary Engine:** PostgreSQL 15+ (Production)
+- **Test Engine:** SQLite (in-memory and file-based test isolation)
+
+### AI & Memory (Planned / In Active Integration)
+- **Primary Provider:** Google Gemini API (`gemini-2.5-flash`)
+- **Secondary Provider:** OpenRouter API (`google/gemini-2.0-flash-001`, with Claude & Llama fallbacks)
+- **Tertiary Provider:** xAI Grok direct API (`grok-4.7`)
+- **Persistent Memory:** Hindsight API
+
+### Frontend (Planned)
+- **Framework:** React 18+ with Vite
+- **Styling:** TailwindCSS
+- **Visualizations:** Plotly.js / React-Plotly
+
+---
+
+## 🗄 Database Schema & Data Models
+
+The database models are implemented using SQLAlchemy 2.x declarative mappings and managed via Alembic:
+
+```
+┌─────────────────────────────────┐           ┌─────────────────────────────────┐
+│           upload_jobs           │           │            feedback             │
+├─────────────────────────────────┤           ├─────────────────────────────────┤
+│ job_id (PK, UUID)               │1         *│ feedback_id (PK, UUID)          │
+│ filename                        │───────────│ upload_job_id (FK)              │
+│ status                          │           │ source, customer_id             │
+│ total_records, inserted_records │           │ feedback_text (Original Raw)    │
+│ duplicate_records, rejected     │           │ cleaned_feedback_text (Cleaned) │
+│ errors (JSONB)                  │           │ quality_status, quality_score   │
+│ created_at, completed_at        │           │ pii_detected, pii_types (JSONB) │
+└─────────────────────────────────┘           │ deleted_at (Soft Delete)        │
+                                              └─────────────────────────────────┘
+                                                               │ 1
+                                                               │
+                                                               │ *
+┌─────────────────────────────────┐           ┌─────────────────────────────────┐
+│             themes              │           │         feedback_themes         │
+├─────────────────────────────────┤           ├─────────────────────────────────┤
+│ theme_id (PK, UUID)             │1         *│ feedback_id (FK)                │
+│ product, theme_name (Unique)    │───────────│ theme_id (FK)                   │
+│ category, status, description   │           │ relevance_score, sentiment      │
+└─────────────────────────────────┘           └─────────────────────────────────┘
+                │ 1                                            │ 1
+                │                                              │
+                │ *                                            │ *
+┌─────────────────────────────────┐           ┌─────────────────────────────────┐
+│         theme_snapshots         │           │        sentiment_history        │
+├─────────────────────────────────┤           ├─────────────────────────────────┤
+│ snapshot_id (PK, UUID)          │           │ sentiment_id (PK, UUID)         │
+│ theme_id (FK)                   │           │ feedback_id (FK), theme_id (FK) │
+│ period_start, period_end        │           │ sentiment_label, score          │
+│ feedback_count, sentiment_avg   │           │ confidence_score                │
+└─────────────────────────────────┘           └─────────────────────────────────┘
+```
+
+### Table Descriptions & Invariants
+
+1. **`feedback`:** Preserves raw customer submissions alongside data-quality metrics and processed text. Soft-delete support via `deleted_at` guarantees historical auditability.
+2. **`upload_jobs`:** Persistent audit log of every batch file upload, tracking total, inserted, duplicate, and rejected counts alongside row error details.
+3. **`themes`:** Canonical topics extracted from customer feedback, uniquely constrained by `(product, theme_name)`.
+4. **`feedback_themes`:** Many-to-many junction associating feedback records with themes, including aspect-level sentiment.
+5. **`sentiment_history`:** Granular sentiment scores and model confidence metrics per record and theme.
+6. **`product_changes`:** Tracks internal release versions, dates, and descriptions to correlate customer sentiment shifts with product updates.
+7. **`theme_snapshots`:** Aggregated periodic rollups of theme volumes and sentiment distributions (`CHECK (period_start <= period_end)`).
+8. **`insights` & `insight_evidence`:** AI-generated recommendations linked to supporting feedback records (`ON DELETE RESTRICT` protects cited evidence).
+9. **`memory_metadata`:** Tracks external Hindsight memory identifiers and source entity relationships.
+
+---
+
+## 🧹 Feedback Ingestion & Quality Control Pipeline
+
+The ingestion and cleaning pipeline enforces strict data integrity before records reach AI models or analytics views:
+
+```
+[Uploaded File] ──► Format Detection (CSV / JSON)
+                       │
+                       ▼
+               Schema Validation
+               - Required fields present
+               - Valid ISO 8601 UTC timestamp
+               - Non-empty feedback text
+                       │
+                       ▼
+             Duplicate Detection
+             - Intra-batch content hash check
+             - DB query on (product, timestamp)
+                       │
+                       ▼
+             Text Normalization
+             - Unicode NFC conversion
+             - CRLF normalized to LF
+             - Whitespace trimmed; emojis preserved
+             - Code snippets preserved (e.g. Map<String, Object>)
+                       │
+                       ▼
+            Sensitive PII Redaction
+            - Emails replaced with [EMAIL]
+            - Phone numbers replaced with [PHONE]
+            - URLs sanitized (credentials removed; debug paths kept)
+            - IPv4 addresses scrubbed (software versions preserved)
+                       │
+                       ▼
+            Spam & Noise Evaluation
+            - Repetitive characters flagged
+            - Gibberish / low-information text detected
+            - Non-Latin scripts (Devanagari, CJK, Cyrillic) protected
+                       │
+                       ▼
+         Quality Scoring (0.0 to 100.0)
+         - content_quality_score (text clarity & detail)
+         - metadata_completeness_score (optional fields populated)
+         - Sentiment Neutrality: emotional text is never penalized
+                       │
+                       ▼
+       Persistence (Atomic & Versioned)
+       - Raw text strictly preserved
+       - Cleaned text written to cleaned_feedback_text
+       - Cleaning run versioned (e.g. '1.0.0')
 ```
 
 ---
 
 ## 🔌 API Reference
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| `POST` | `/api/feedback/upload` | Upload feedback files (CSV / JSON) |
-| `GET` | `/api/feedback` | Retrieve feedback |
-| `POST` | `/api/feedback/analyze` | Trigger analysis |
-| `GET` | `/api/themes` | Retrieve identified themes |
-| `GET` | `/api/sentiment/trends` | Retrieve sentiment trends |
-| `GET` | `/api/insights` | Retrieve generated insights |
-| `POST` | `/api/product-changes` | Add product releases |
-| `GET` | `/api/product-impact` | Compare releases and feedback |
-| `POST` | `/api/agent/chat` | Chat with the AI agent |
-| `GET` | `/api/memory/search` | Search historical memories |
-| `GET` | `/api/memory/history` | View memory history |
-| `GET` | `/api/health` | Health check |
+### 1. Implemented Endpoints
 
-> For larger uploads, add background processing and a job-status endpoint.
+#### Health & Root Metadata
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/` | Returns service name, version, and API documentation links. |
+| `GET` | `/api/health` | Verifies database connectivity and reports application health. |
+
+**Example Health Response:**
+```json
+{
+  "status": "healthy",
+  "version": "1.0.0",
+  "environment": "development",
+  "database": {
+    "status": "connected",
+    "details": "PostgreSQL connection active"
+  }
+}
+```
 
 ---
 
-## 📁 Project Structure
+#### Feedback Ingestion & Retrieval
 
-*Suggested layout — adjust to match your repository.*
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/feedback/upload` | Ingests multipart CSV or JSON feedback files. |
+| `GET` | `/api/feedback` | Lists feedback records with pagination and filtering. |
+| `GET` | `/api/feedback/{feedback_id}` | Retrieves a single feedback record by UUID. |
+| `GET` | `/api/feedback/jobs/{job_id}` | Retrieves status and metrics of an ingestion job. |
 
+**Upload Ingestion Example:**
+```powershell
+Invoke-RestMethod -Method Post -Uri "http://localhost:8000/api/feedback/upload" -Form @{
+    file = Get-Item -Path "feedback.json"
+}
 ```
-feedback-synthesizer/
+
+**Upload Response (HTTP 200):**
+```json
+{
+  "job_id": "b3e210d7-2fa5-45d2-b6be-ca0e10f135b6",
+  "status": "completed",
+  "filename": "feedback.json",
+  "total_records": 2,
+  "inserted_records": 2,
+  "duplicate_records": 0,
+  "rejected_records": 0,
+  "errors": [],
+  "message": "Successfully ingested 2 feedback records."
+}
+```
+
+---
+
+#### Data Cleaning & Quality Control
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/feedback/clean` | Batch cleans unprocessed feedback records using row-level locking. |
+| `POST` | `/api/feedback/{feedback_id}/clean` | Executes the cleaning pipeline on a single record. |
+| `GET` | `/api/feedback/{feedback_id}/quality` | Returns quality scores, detected PII types, and flags. |
+| `GET` | `/api/feedback/quality/summary` | Returns aggregated quality distributions and metrics. |
+
+**Batch Clean Request Example:**
+```powershell
+Invoke-RestMethod -Method Post -Uri "http://localhost:8000/api/feedback/clean?limit=100&reprocess=false"
+```
+
+**Quality Summary Response Example:**
+```json
+{
+  "total_records": 100,
+  "quality_status_counts": {
+    "clean": 92,
+    "flagged": 6,
+    "rejected": 2,
+    "pending": 0,
+    "failed": 0
+  },
+  "processing_status_counts": {
+    "processed": 100,
+    "unprocessed": 0,
+    "failed": 0
+  },
+  "pii_detected_count": 14,
+  "average_quality_score": 91.4,
+  "flag_distribution": {
+    "PII_PRESENT": 14,
+    "VERY_SHORT": 8,
+    "REPEATED_CHARS": 4,
+    "SPAM_PATTERN": 2
+  }
+}
+```
+
+---
+
+### 2. Planned Endpoints (Specification)
+
+The following endpoints represent the target API contract for upcoming development parts:
+
+| Method | Endpoint | Target Milestone | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/feedback/analyze` | Part 5 | Triggers multi-provider AI classification and aspect sentiment analysis. |
+| `GET` | `/api/themes` | Part 6 | Retrieves identified themes, status, and feedback volume. |
+| `GET` | `/api/sentiment/trends` | Part 6 | Returns daily, weekly, and monthly sentiment trajectories. |
+| `GET` | `/api/insights` | Part 7 | Returns evidence-grounded product insights and recommendations. |
+| `POST` | `/api/product-changes` | Part 7 | Records product releases, version tags, and feature flags. |
+| `GET` | `/api/product-impact` | Part 7 | Compares sentiment before and after specific release dates. |
+| `POST` | `/api/agent/chat` | Part 8 | Interactive Q&A with the memory-augmented product intelligence agent. |
+| `GET` | `/api/memory/search` | Part 9 | Semantic search over Hindsight episodic and temporal memories. |
+
+---
+
+## 📁 Repository Structure
+
+```text
+Feedback/
 ├── backend/
+│   ├── alembic/                    # Database migration environment
+│   │   ├── versions/               # Versioned migration scripts
+│   │   └── env.py                  # Alembic runner configuration
 │   ├── app/
-│   │   ├── api/            # FastAPI routes
-│   │   ├── ingestion/      # parsers, validator, deduplicator, PII redactor
-│   │   ├── agent/          # orchestrator, classifier, theme/trend/correlation logic
-│   │   ├── memory/         # Hindsight client, retrieval, reconciliation
-│   │   ├── models/         # SQLAlchemy models
-│   │   ├── services/       # insights, analytics, evidence validation
-│   │   └── main.py
-│   ├── tests/
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── pages/          # Dashboard, ThemeExplorer, SentimentTimeline,
-│   │   │                   # ProductImpact, MemoryExplorer, AIChat
-│   │   └── components/
-│   └── package.json
-├── data/                   # sample CSV / JSON datasets
-├── docs/
-│   └── architecture.png
-├── docker-compose.yml
-├── .env.example
-└── README.md
+│   │   ├── api/                    # API routing layer
+│   │   │   └── routes/
+│   │   │       ├── health.py       # Health check endpoints
+│   │   │       └── feedback.py     # Ingestion & cleaning endpoints
+│   │   ├── core/                   # Infrastructure configuration
+│   │   │   ├── config.py           # Pydantic Settings & environment parsing
+│   │   │   ├── exceptions.py       # Centralized exception handlers
+│   │   │   └── logging.py          # Structured logging setup
+│   │   ├── db/                     # Database session management
+│   │   │   ├── base.py             # DeclarativeBase base model
+│   │   │   └── session.py          # Session factory & dependency injection
+│   │   ├── integrations/           # External service adapters
+│   │   │   ├── ai/                 # Multi-provider AI routing & failover (In progress)
+│   │   │   ├── gemini/             # Google Gemini integration client
+│   │   │   └── hindsight/          # Hindsight persistent memory client
+│   │   ├── models/                 # SQLAlchemy 2.x declarative models
+│   │   │   ├── feedback.py         # Feedback records & quality fields
+│   │   │   ├── upload_job.py       # Ingestion job tracking
+│   │   │   ├── theme.py            # Themes & theme snapshots
+│   │   │   ├── sentiment.py        # Sentiment history
+│   │   │   ├── product_change.py   # Product releases & feature flags
+│   │   │   ├── insight.py          # Insights & citation evidence
+│   │   │   └── memory.py           # Hindsight metadata tracking
+│   │   ├── schemas/                # Pydantic request/response schemas
+│   │   │   ├── feedback.py         # Feedback & cleaning DTOs
+│   │   │   └── health.py           # Health response schemas
+│   │   ├── services/               # Core business logic
+│   │   │   ├── feedback_ingestion.py   # Parsing, validation & deduplication
+│   │   │   ├── feedback_cleaning.py    # Batch orchestrator with row locking
+│   │   │   ├── text_normalization.py   # Unicode & whitespace normalization
+│   │   │   ├── pii_detector.py         # PII detection & redaction
+│   │   │   ├── spam_detector.py        # Noise & spam classification
+│   │   │   └── quality_scorer.py       # Decoupled quality scoring
+│   │   └── main.py                 # FastAPI application factory
+│   ├── tests/                      # Automated test suite (88 passing tests)
+│   │   ├── test_health.py
+│   │   ├── test_models.py
+│   │   ├── test_database_session.py
+│   │   ├── test_schema_refinements.py
+│   │   ├── test_alembic.py
+│   │   ├── test_safeguards.py
+│   │   ├── test_feedback_ingestion.py
+│   │   └── test_feedback_cleaning.py
+│   ├── .env.example                # Template configuration file
+│   ├── alembic.ini                 # Alembic configuration
+│   └── requirements.txt            # Python dependencies
+├── .gitignore                      # Git ignore patterns
+└── README.md                       # Root documentation
 ```
 
 ---
 
-## 🚀 Getting Started
-
-> ⚠️ Commands below are a template. Update paths and service names to match your implementation.
+## 🚀 Getting Started & Local Setup
 
 ### Prerequisites
 
-- Python 3.11+
-- Node.js 18+
-- PostgreSQL 15+
-- Docker & Docker Compose (optional)
-- A Gemini API key
-- Access to a Hindsight memory service
-
-### 1. Clone
-
-```bash
-git clone https://github.com/<your-username>/feedback-synthesizer.git
-cd feedback-synthesizer
-```
-
-### 2. Configure environment
-
-Create a `.env` file (never commit it):
-
-```env
-# LLM
-GEMINI_API_KEY=your_gemini_api_key
-
-# Database
-DATABASE_URL=postgresql://user:password@localhost:5432/feedback_db
-
-# Hindsight memory
-HINDSIGHT_URL=http://localhost:8888
-HINDSIGHT_API_KEY=your_hindsight_key
-
-# App
-ENVIRONMENT=development
-```
-
-### 3a. Run with Docker
-
-```bash
-docker compose up --build
-```
-
-### 3b. Run manually
-
-**Backend**
-
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
-**Frontend**
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### 4. Open the app
-
-- Frontend: <http://localhost:5173>
-- API docs (Swagger): <http://localhost:8000/docs>
-- Health check: <http://localhost:8000/api/health>
+- **Python:** 3.11 or newer (`python --version`)
+- **PostgreSQL:** Version 15+ (Required for persistent production usage; SQLite is supported for local tests)
+- **PowerShell:** PowerShell 5.1+ (Windows) or standard bash shell (macOS/Linux)
 
 ---
 
-## 🎬 Demo Scenario
+### Step 1: Clone the Repository
 
-**Checkout Improvement and Emerging Payment Issues**
+```bash
+git clone https://github.com/mukundchoubey88-lang/Feadback-synthziser.git
+cd Feadback-synthziser
+```
 
-| When | What happens |
-|---|---|
-| **Sept 2026** | Customers repeatedly report slow checkout → theme *Checkout performance* flagged as recurring, mostly negative → stored in Hindsight. |
-| **20 Oct 2026** | Checkout optimisation released → added to `product_changes`. |
-| **Nov 2026** | New feedback says checkout is faster but payments are failing. |
+---
 
-The agent then:
+### Step 2: Set Up Virtual Environment
 
-1. Analyses the new feedback.
-2. Retrieves September's checkout complaints from memory.
-3. Recognises the previously recurring issue.
-4. Compares feedback before vs. after the October release.
-5. Finds a reduction in checkout complaints.
-6. Detects *Payment failures* as a separate emerging theme.
-7. Produces an evidence-backed recommendation.
+#### Windows (PowerShell):
+```powershell
+cd backend
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
 
-**Output**
+*(If script execution is blocked on Windows, run: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process`)*
 
-- **Checkout performance:** complaints declined following the October optimisation release.
-- **Emerging concern:** payment failures are appearing in recent feedback.
-- **Recommended action:** review payment gateway reliability and monitor transaction success rates.
+#### macOS / Linux:
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+```
+
+---
+
+### Step 3: Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+### Step 4: Configure Environment Variables
+
+Create your local `.env` file from the provided template:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` to configure your settings:
+
+```env
+# Application Settings
+ENVIRONMENT=development
+LOG_LEVEL=INFO
+API_V1_PREFIX=/api
+
+# Database Connection (PostgreSQL with psycopg v3 driver)
+DATABASE_URL=postgresql+psycopg://postgres:your_password@localhost:5432/feedback_db
+
+# Multi-Provider AI Configuration (Part 5 & 5.1)
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-2.5-flash
+
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+OPENROUTER_MODEL=google/gemini-2.0-flash-001
+OPENROUTER_FALLBACK_MODELS=anthropic/claude-3.5-haiku,meta-llama/llama-3.3-70b-instruct
+
+XAI_API_KEY=your_xai_api_key_here
+XAI_MODEL=grok-4.7
+
+AI_PRIMARY_PROVIDER=gemini
+AI_PROVIDER_FALLBACK_ENABLED=true
+AI_PROVIDER_PRIORITY=gemini,openrouter,grok
+AI_REQUEST_TIMEOUT=30.0
+AI_PROVIDER_MAX_RETRIES=2
+AI_PROVIDER_COOLDOWN_SECONDS=60
+
+# Hindsight Persistent Memory Configuration (Part 9)
+HINDSIGHT_API_KEY=
+HINDSIGHT_BASE_URL=
+
+# Upload Safeguards
+MAX_UPLOAD_FILE_SIZE_BYTES=10485760
+MAX_UPLOAD_RECORDS=10000
+MAX_FEEDBACK_TEXT_LENGTH=10000
+
+# CORS Configuration
+CORS_ORIGINS=http://localhost:5173
+```
+
+---
+
+### Step 5: Run Database Migrations
+
+Apply the Alembic migration history to your PostgreSQL database:
+
+```bash
+alembic upgrade head
+```
+
+---
+
+### Step 6: Start the Development Server
+
+```bash
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Once running, navigate to:
+- **Interactive Swagger Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **ReDoc Documentation:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
+- **Service Health Check:** [http://localhost:8000/api/health](http://localhost:8000/api/health)
+
+---
+
+## 🧪 Running Automated Tests
+
+The backend includes a comprehensive automated test suite leveraging `pytest` and `httpx`. The test suite uses isolated in-memory and SQLite test databases, meaning tests run cleanly without requiring a live PostgreSQL instance.
+
+Execute all tests from the `backend/` directory:
+
+```powershell
+pytest -v
+```
+
+**Test Coverage Summary (88 passing tests):**
+- `test_health.py` — Health check status and service metadata.
+- `test_models.py` — Model relationships, constraints, and table definitions.
+- `test_database_session.py` — Database engine initialization and session management.
+- `test_schema_refinements.py` — Soft deletes, foreign key protections, and snapshot checks.
+- `test_alembic.py` — Migration script validity and head alignment.
+- `test_safeguards.py` — File upload size, record count, and text length bounds.
+- `test_feedback_ingestion.py` — CSV/JSON ingestion, deduplication, and job tracking.
+- `test_feedback_cleaning.py` — Normalization, PII redaction, noise filtering, and scoring.
 
 ---
 
 ## 🛡 Edge Cases & Reliability
 
-| Edge case | Expected behaviour |
-|---|---|
-| Duplicate feedback / repeated uploads | Idempotent ingestion, no duplicate processing |
-| Missing timestamps | Flag record, exclude from time-based analysis |
-| Invalid CSV / JSON | Report validation errors (never drop silently) |
-| Multiple themes / mixed sentiment | Multiple theme links, aspect-level sentiment |
-| Sarcasm / very short feedback | Lower confidence or mark ambiguous |
-| Multilingual feedback | Process supported languages or flag unsupported |
-| Low feedback volume | Avoid strong trend conclusions |
-| Seasonal spikes | Compare appropriate historical periods |
-| Unrelated release and issue | Avoid unsupported attribution |
-| Conflicting memories | Preserve history, reconcile against source data |
-| Hindsight unavailable | Continue structured ingestion, mark memory limits |
-| LLM API failure | Retry and preserve unprocessed work |
-| Prompt injection | Treat feedback as untrusted data, not instructions |
-| PII in feedback | Redact and apply access controls |
-| User disputes an insight | Allow review and correction |
-| Stale dashboard | Show last successful update time |
-
-### Security & privacy
-
-- API keys via environment variables only.
-- No database credentials in the frontend.
-- Access control on uploaded data; no cross-user / cross-tenant leakage.
-- Data deletion and retention policies supported.
+| Scenario | Handled Behavior | Implementation Status |
+| :--- | :--- | :--- |
+| **Duplicate Submissions** | Deduplicated intra-batch and against the database via indexed lookup on `(product, timestamp)`. | ✅ Implemented |
+| **Missing Timestamps** | Rejected explicitly with validation error; synthetic timestamps are never fabricated. | ✅ Implemented |
+| **PII Exposure** | Detected and scrubbed into generic placeholders (`[EMAIL]`, `[PHONE]`, `[URL]`, `[IP_ADDRESS]`, `[ID_NUMBER]`). | ✅ Implemented |
+| **Raw Data Loss** | Original feedback is preserved in immutable database columns; only cleaned copies are processed. | ✅ Implemented |
+| **High Concurrency Cleaning** | Handled with `SELECT ... FOR UPDATE SKIP LOCKED` to prevent duplicate processing by worker threads. | ✅ Implemented |
+| **Emotional / Critical Feedback** | Evaluated with strictly neutral quality scoring; negative sentiment is never penalized as low quality. | ✅ Implemented |
+| **Multilingual Input** | Protected across Latin, Devanagari, Cyrillic, CJK, and Arabic scripts. | ✅ Implemented |
+| **AI Provider Quota Exhaustion** | Failover routing from Gemini to OpenRouter to direct xAI Grok with exponential backoff. | ⏳ In Active Integration |
+| **Memory Service Outage** | PostgreSQL continues serving structured analytics; memory-augmented insights are marked as limited. | ⏳ Planned |
 
 ---
 
-## 🗺 MVP Roadmap
+## 🗺 Development Roadmap
 
-| Phase | Focus | Deliverable |
-|---|---|---|
-| **1 – Foundation** | React, FastAPI, PostgreSQL, models, CSV/JSON upload, validation, dedup | Working ingestion system |
-| **2 – AI Intelligence** | Gemini integration, classification, sentiment, theme extraction | Feedback intelligence pipeline |
-| **3 – Memory Integration** | Hindsight config, memory write/retrieve, episodic / semantic / temporal workflows | Agent with persistent historical context |
-| **4 – Trend & Product Analysis** | Theme snapshots, emerging detection, trends, release records, before/after comparison | Historical & product-change intelligence |
-| **5 – Insight Generation** | Evidence validation, recommendations, confidence thresholds | Evidence-backed AI insights |
-| **6 – Frontend & Testing** | Dashboard, theme explorer, timeline, impact tracker, memory explorer, chat, edge-case tests | End-to-end MVP |
+```
+[Part 1: Foundation] ──► [Part 2: DB Models] ──► [Part 2.1: Schema Hardening]
+        ✓                         ✓                            ✓
+                                                               │
+[Part 4.1: Cleaning Hardening] ◄── [Part 4: Data Quality] ◄── [Part 3: Ingestion API]
+        ✓                                    ✓                         ✓
+        │
+        ▼
+[Part 5 / 5.1: Multi-Provider AI Failover] (In Progress)
+        │
+        ▼
+[Part 6: Theme Discovery & Aspect Sentiment] (Upcoming)
+        │
+        ▼
+[Part 7: Product Release Correlation & Insights] (Upcoming)
+        │
+        ▼
+[Part 8 & 9: Hindsight Persistent Memory & Research Agent] (Upcoming)
+        │
+        ▼
+[Part 10: Frontend UI (React + Vite) & Production Deployment] (Upcoming)
+```
 
-### Priorities
-
-- **P0 (must have):** CSV/JSON ingestion, validation & dedup, theme classification, sentiment, PostgreSQL, Hindsight integration & retrieval, emerging theme detection, release correlation, evidence-backed insights, basic dashboard.
-- **P1 (should have):** multilingual support, theme merge/split, advanced trends, memory correction, version-based comparisons, stronger privacy controls.
-- **P2 (future):** live integrations, Jira/Linear automation, advanced anomaly detection, churn-risk indicators, causal impact analysis, multi-tenant access control.
-
-### MVP acceptance criteria
-
-- [ ] Upload historical feedback via CSV / JSON
-- [ ] Validate and store feedback in PostgreSQL
-- [ ] Identify multiple themes and sentiment per record
-- [ ] Detect recurring and emerging themes
-- [ ] Store and retrieve meaningful memories in Hindsight
-- [ ] Answer questions using previous feedback
-- [ ] Add product release information
-- [ ] Compare feedback across release periods
-- [ ] Link insights to supporting feedback
-- [ ] Display current analytics on the dashboard
-- [ ] Handle duplicates and invalid inputs
-- [ ] Memory / LLM failures never silently corrupt structured data
-
----
-
-## 📊 Success Metrics
-
-| Metric | Measurement |
-|---|---|
-| Feedback ingestion | Successfully processed records |
-| Duplicate detection | % of duplicates identified |
-| Theme identification | Accuracy vs. reviewed samples |
-| Sentiment analysis | Agreement with human labels |
-| Emerging issue detection | Relevant new themes identified |
-| Memory retrieval | Relevance of retrieved memories |
-| Evidence coverage | % of insights backed by source feedback |
-| Processing reliability | Successful processing rate |
-| Dashboard freshness | Time from ingestion to updated analytics |
-
-The MVP establishes **measurable baselines** rather than promising arbitrary accuracy figures.
+- [x] **Part 1:** Backend Foundation, FastAPI Factory, Settings & Logging
+- [x] **Part 2:** PostgreSQL Relational Models (9 Tables) & Alembic Migrations
+- [x] **Part 2.1:** Schema Refinement, Soft Deletes & Integrity Constraints
+- [x] **Part 3:** CSV/JSON Ingestion API, Duplicate Detection & Upload Job Tracking
+- [x] **Part 4:** Data Cleaning, Text Normalization, PII Scrubbing & Quality Scoring
+- [x] **Part 4.1:** Data Cleaning Corrections, Multilingual Hardening & Row Locking
+- [ ] **Part 5 / 5.1:** Multi-Provider AI Orchestration (Gemini → OpenRouter → xAI Grok)
+- [ ] **Part 6:** Semantic Theme Extraction, Aspect-Based Sentiment & Volume Velocity
+- [ ] **Part 7:** Product Change Correlation & Evidence-Backed Recommendation Engine
+- [ ] **Part 8:** AI Research Agent & Memory-Augmented Natural Language Q&A
+- [ ] **Part 9:** Deep Hindsight Integration (Episodic, Semantic & Temporal Recall)
+- [ ] **Part 10:** Frontend Dashboard (React, Vite, Plotly) & Production Deployment
 
 ---
 
-## 🔮 Future Scope
+## 👤 Author & License
 
-- Google Play and Apple App Store integrations
-- Zendesk, Intercom, Slack and email connectors
-- Automatic Jira / Linear issue creation
-- Competitor review analysis
-- Churn and dissatisfaction signals
-- Advanced multilingual analysis
-- Release impact forecasting
-- Human-in-the-loop insight approval
-- Multi-product and multi-tenant support
-
----
-
-## 👥 Target Users
-
-| Persona | Uses it to |
-|---|---|
-| **Product Managers** | Spot pain points, monitor release impact, prioritise work |
-| **Customer Experience Teams** | Find repeated complaints, track satisfaction |
-| **Leadership** | See high-level trends and make data-driven decisions |
-| **Product Analysts** | Explore history, compare periods, validate AI insights |
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a branch: `git checkout -b feature/your-feature`
-3. Commit your changes: `git commit -m "Add your feature"`
-4. Push: `git push origin feature/your-feature`
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-Add your license here (e.g., MIT).
-
----
-
-## 👤 Author
-
-**Mukund Choubey** — B.Tech CSE (AI & ML), S-VYASA, Bengaluru
-
----
+- **Author:** Mukund Choubey — *B.Tech CSE (AI & ML), S-VYASA, Bengaluru*
+- **Repository:** [https://github.com/mukundchoubey88-lang/Feadback-synthziser.git](https://github.com/mukundchoubey88-lang/Feadback-synthziser.git)
+- **License:** Licensed under the [MIT License](LICENSE).
 
 <p align="center"><i>Move from collecting customer feedback to continuously learning from it.</i></p>
