@@ -37,6 +37,16 @@
 
 **User Feedback Synthesizer** collects customer feedback from multiple sources, cleans and standardises it, identifies themes and sentiment, and stores everything in PostgreSQL. What makes it different is a **long-term memory layer (Hindsight)**: when new feedback arrives, the agent retrieves what customers said before, compares patterns across time, and links feedback trends to product releases.
 
+### 🎯 Current Status
+
+**✅ Frontend Dashboard** — Fully functional React + Vite + TailwindCSS + Plotly.js dashboard with all 7 views, mock data, and complete UI/UX (deployed in `frontend/`)
+
+**🚧 Backend API** — Architecture documented, implementation pending (FastAPI + PostgreSQL + Gemini + Hindsight)
+
+**📚 Documentation** — Complete system architecture, database schema, API reference, and MVP roadmap
+
+> **You can run the frontend now** to see the full dashboard experience. The backend is described in detail in this README for implementation.
+
 | Traditional feedback tools | This platform |
 |---|---|
 | Analyse feedback in isolation | Remembers historical feedback |
@@ -267,27 +277,64 @@ feedback-synthesizer/
 
 ## 🚀 Getting Started
 
-> ⚠️ Commands below are a template. Update paths and service names to match your implementation.
-
 ### Prerequisites
 
-- Python 3.11+
+- Python 3.11+ (for backend, coming soon)
 - Node.js 18+
-- PostgreSQL 15+
+- PostgreSQL 15+ (for backend, coming soon)
 - Docker & Docker Compose (optional)
-- A Gemini API key
-- Access to a Hindsight memory service
+- A Gemini API key (for backend)
+- Access to a Hindsight memory service (for backend)
 
 ### 1. Clone
 
 ```bash
-git clone https://github.com/<your-username>/feedback-synthesizer.git
-cd feedback-synthesizer
+git clone https://github.com/mukundchoubey88-lang/Feadback-synthziser.git
+cd Feadback-synthziser
 ```
 
-### 2. Configure environment
+### 2. Run the Frontend Dashboard (Available Now)
 
-Create a `.env` file (never commit it):
+The frontend is a complete, working dashboard with mock data that demonstrates all features.
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+**Open:** <http://localhost:5173>
+
+The dashboard includes:
+- ✅ 7 complete views (Overview, Ingestion, AI Providers, Insights, Reasoning, Analytics, Memory)
+- ✅ Live system catalog with agent-tracked elements
+- ✅ Interactive Plotly charts
+- ✅ Docked agent chat panel
+- ✅ Evidence-backed insights with citation trails
+- ✅ Reasoning trace visualization
+- ✅ Mock data demonstrating all features
+
+See `frontend/README.md` for detailed documentation.
+
+### 3. Backend Setup (Coming Soon)
+
+The backend (FastAPI + PostgreSQL + Gemini + Hindsight) is described in this README but not yet implemented.
+
+Once available:
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+**API docs:** <http://localhost:8000/docs>
+
+### 4. Configure environment (Backend)
+
+Create a `.env` file:
 
 ```env
 # LLM
@@ -303,38 +350,6 @@ HINDSIGHT_API_KEY=your_hindsight_key
 # App
 ENVIRONMENT=development
 ```
-
-### 3a. Run with Docker
-
-```bash
-docker compose up --build
-```
-
-### 3b. Run manually
-
-**Backend**
-
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
-**Frontend**
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### 4. Open the app
-
-- Frontend: <http://localhost:5173>
-- API docs (Swagger): <http://localhost:8000/docs>
-- Health check: <http://localhost:8000/api/health>
 
 ---
 
