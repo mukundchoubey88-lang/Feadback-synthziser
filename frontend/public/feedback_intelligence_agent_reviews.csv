@@ -1,0 +1,21 @@
+source,customer_id,feedback_text,product,feature,timestamp,app_version
+g2,cust-8801,"The Feedback Intelligence Agent cut our product triage time from 12 hours a week to under 45 minutes. The theme clustering is spot-on.",Feedback Synthesizer,Theme Discovery,2026-11-07T16:00:00Z,1.0.0
+zendesk,cust-8802,"When uploading a 50MB CSV with 25,000 rows, the browser UI briefly freezes before showing the analysis output.",Feedback Synthesizer,Ingestion,2026-11-07T15:20:00Z,1.0.0
+capterra,cust-8803,"Automatic PII redaction gives our legal team complete peace of mind. Emails and phone numbers are scrubbed before reaching the LLM.",Feedback Synthesizer,PII Redaction,2026-11-07T14:45:00Z,1.0.0
+in_app,cust-8804,"Please add a dark mode toggle to the console workspace. Staring at near-white backgrounds during late night releases causes eye strain.",Feedback Synthesizer,Console UI,2026-11-07T14:10:00Z,1.0.0
+slack,cust-8805,"The Hindsight memory bank accurately cited an episodic incident from September when we diagnosed our payment gateway outage today.",Feedback Synthesizer,Hindsight Memory,2026-11-07T13:30:00Z,1.0.0
+email,cust-8806,"Stripe subscription renewal charged our corporate card twice for the enterprise seat tier. Please contact billing@enterpriseco.com.",Feedback Synthesizer,Billing,2026-11-07T12:50:00Z,1.0.0
+g2,cust-8807,"The editorial SaaS design is exceptionally clean and uncluttered. It feels like an executive tool rather than noisy analytics software.",Feedback Synthesizer,Design,2026-11-07T12:00:00Z,1.0.0
+zendesk,cust-8808,"API rate limiting on the POST /api/feedback/clean endpoint returns 429 when processing batches above 5,000 items.",Feedback Synthesizer,API,2026-11-07T11:15:00Z,1.0.0
+in_app,cust-8809,"Love the instant sentiment breakdown bar on the Ingestion screen! Seeing positive vs negative split immediately is super valuable.",Feedback Synthesizer,Ingestion,2026-11-07T10:40:00Z,1.0.0
+trustpilot,cust-8810,"Support team resolved our custom OAuth integration within 30 minutes. Exceptional technical assistance.",Feedback Synthesizer,Support,2026-11-07T10:00:00Z,1.0.0
+capterra,cust-8811,"We replaced three separate feedback tools (Typeform, Sprig, and Jira Service Desk) with this single synthesizer agent.",Feedback Synthesizer,Platform,2026-11-07T09:15:00Z,1.0.0
+in_app,cust-8812,"Would love to see native Jira and Linear integration to turn synthesized insights into engineering backlog tickets with one click.",Feedback Synthesizer,Integrations,2026-11-07T08:30:00Z,1.0.0
+email,cust-8813,"Unable to download the PDF executive summary report on Firefox browser. Call me at 555-014-9922 to troubleshoot.",Feedback Synthesizer,Reports,2026-11-06T19:00:00Z,1.0.0
+g2,cust-8814,"The confidence score on synthesized insights prevents hallucination. We can always verify the exact feedback UUID citations.",Feedback Synthesizer,Insights,2026-11-06T17:40:00Z,1.0.0
+slack,slack,cust-8815,"Webhook events for new negative sentiment alerts are occasionally delayed by 15-20 minutes during peak hours.",Feedback Synthesizer,Webhooks,2026-11-06T16:20:00Z,1.0.0
+in_app,cust-8816,"Keyboard navigation on the feedback records list makes triage effortless. Tab and arrow key shortcuts are great.",Feedback Synthesizer,Console UI,2026-11-06T15:00:00Z,1.0.0
+zendesk,cust-8817,"Need ability to configure custom sentiment keywords and company-specific acronym dictionaries for our medical domain.",Feedback Synthesizer,Classification,2026-11-06T14:10:00Z,1.0.0
+trustpilot,cust-8818,"Pricing is transparent and well worth the ROI. We detected a major onboarding drop-off in our mobile app within 24 hours of launch.",Feedback Synthesizer,Pricing,2026-11-06T13:00:00Z,1.0.0
+in_app,cust-8819,"The release impact correlation report clearly showed our checkout optimization in v2.4 lifted positive sentiment by 34%.",Feedback Synthesizer,Reports,2026-11-06T11:45:00Z,1.0.0
+capterra,cust-8820,"Outstanding tool for product managers. Turning unstructured Zendesk tickets into prioritized thematic roadmaps is seamless.",Feedback Synthesizer,Overview,2026-11-06T10:30:00Z,1.0.0

@@ -1,0 +1,26 @@
+source,customer_id,feedback_text,product,feature,timestamp,app_version
+in_app,cust-1001,"The new analytics dashboard loads 10x faster than before. Really appreciate the keyboard shortcuts and clean typography!",Analytics Portal,Dashboard,2026-11-07T14:30:00Z,2.4.0
+zendesk,cust-1002,"Exporting raw feedback to CSV fails with gateway 504 timeout whenever the table has more than 500 records.",Analytics Portal,Export,2026-11-07T13:45:00Z,2.4.0
+email,cust-1003,"My credit card was charged twice for the team seat upgrade. Please refund duplicate charge $120 to sarah.jenkins@techcorp.io.",Billing,Stripe,2026-11-07T12:15:00Z,2.4.0
+app_store,cust-1004,"Love the clean editorial design and dark mode previews. It is so much easier to read at night.",Mobile App,UI,2026-11-07T11:20:00Z,2.4.0
+slack,cust-1005,"Checkout completely freezes on mobile Safari after entering 3DS confirmation code from my bank.",Billing,Checkout,2026-11-07T10:05:00Z,2.4.0
+in_app,cust-1006,"Can you please add support for webhook payload testing directly from the developer settings?",Developer Console,Webhooks,2026-11-07T09:30:00Z,2.4.0
+zendesk,cust-1007,"Search bar doesn't return any results when searching for multiple keywords separated by commas.",Search & Discovery,Search,2026-11-07T08:50:00Z,2.4.0
+app_store,cust-1008,"App crashed twice when switching between overview and theme tabs on iOS 18. Please fix urgently.",Mobile App,Stability,2026-11-07T08:10:00Z,2.4.0
+trustpilot,cust-1009,"Customer support resolved our SSO migration issue within 15 minutes. Best onboarding experience we have had.",Platform,Support,2026-11-06T18:20:00Z,2.4.0
+in_app,cust-1010,"The automated theme discovery helped us identify our mobile cart drop-off immediately after the release.",Analytics Portal,Themes,2026-11-06T17:15:00Z,2.4.0
+zendesk,cust-1011,"Invoice PDF generation is missing our company VAT number and European tax identifier.",Billing,Invoicing,2026-11-06T16:00:00Z,2.4.0
+email,cust-1012,"Urgent: Unable to log in with Google OAuth since this morning. Reach me at 415-555-0199 or alex.m@startup.co.",Platform,Authentication,2026-11-06T15:30:00Z,2.4.0
+in_app,cust-1013,"Filter presets on the feedback list save our team hours every week. Fantastic update!",Analytics Portal,Filters,2026-11-06T14:45:00Z,2.4.0
+slack,cust-1014,"Webhooks are dropping event deliveries intermittently with HTTP 429 rate limit errors.",Developer Console,API,2026-11-06T13:10:00Z,2.4.0
+app_store,cust-1015,"Very intuitive navigation and fast response times. Everything feels snappy and responsive.",Mobile App,Performance,2026-11-06T12:00:00Z,2.4.0
+trustpilot,cust-1016,"Pricing is reasonable for mid-size teams but annual billing discount could be more competitive.",Billing,Pricing,2026-11-06T11:20:00Z,2.4.0
+in_app,cust-1017,"Table sorting by quality score resets whenever I navigate between pagination pages.",Analytics Portal,Table,2026-11-06T10:40:00Z,2.4.0
+zendesk,cust-1018,"Need the ability to export synthesized theme reports to PDF for executive presentations.",Analytics Portal,Reports,2026-11-06T09:15:00Z,2.4.0
+app_store,cust-1019,"Push notifications for critical sentiment alerts arrived with a 2-hour delay yesterday.",Notification Engine,Alerts,2026-11-05T20:30:00Z,2.3.9
+in_app,cust-1020,"The Hindsight memory feature accurately connected our October checkout bug to last month's incident.",Analytics Portal,Memory,2026-11-05T19:00:00Z,2.3.9
+slack,cust-1021,"API rate limits are too restrictive for batch sentiment classification across 50,000 records.",Developer Console,API,2026-11-05T17:40:00Z,2.3.9
+zendesk,cust-1022,"Two-factor authentication SMS codes are sometimes taking up to 5 minutes to arrive on Vodafone.",Platform,Authentication,2026-11-05T16:25:00Z,2.3.9
+app_store,cust-1023,"Great app overall! Would love to see an iPad tablet optimized view with side-by-side comparison.",Mobile App,UI,2026-11-05T15:10:00Z,2.3.9
+in_app,cust-1024,"PII redaction automatically caught credit card patterns before they reached our analytics. Super impressed.",Analytics Portal,Security,2026-11-05T14:00:00Z,2.3.9
+trustpilot,cust-1025,"Solid feedback synthesizer. Replaced three disconnected survey tools into a single intelligence console.",Platform,Overview,2026-11-05T12:30:00Z,2.3.9
