@@ -1,0 +1,55 @@
+# Environments
+venv/
+.venv/
+env/
+backend/venv/
+backend/.venv/
+
+# Environment files
+.env
+backend/.env
+*.env.local
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Coverage and test artifacts
+.coverage
+htmlcov/
+.tox/
+
+# Environment files
+.env.*
+!.env.example
+!**/.env.example
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Test artifacts
+.coverage
+htmlcov/
+.tox/
+
+# Node.js dependencies and generated frontend builds
+node_modules/
+dist/
+frontend/node_modules/
+frontend/dist/
