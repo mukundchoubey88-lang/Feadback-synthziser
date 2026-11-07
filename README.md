@@ -40,6 +40,17 @@
 
 Standard feedback analytics tools evaluate customer input as isolated, point-in-time snapshots. When users report issues, teams see aggregate complaint counts for the current sprint, but lose context on whether an issue is recurring, worsening, or previously resolved.
 
+### Current status
+
+The ingestion and data-quality backend is implemented (FastAPI, PostgreSQL, 88 passing tests). The React + Vite + TypeScript app in `frontend/` includes the public landing page and a console for the live health, feedback, ingestion, and quality APIs. Multi-provider AI, theme discovery, evidence-backed insights, and Hindsight memory are specified and not served by the API yet.
+
+| Traditional feedback tools | This platform |
+|---|---|
+| Analyse feedback in isolation | Remembers historical feedback |
+| Show what customers say *now* | Shows how concerns *evolve* |
+| Charts without context | Evidence-backed recommendations |
+| No link to product decisions | Correlates feedback with releases |
+
 This platform bridges that gap by combining:
 - **Strict Ingestion & Quality Control:** Deterministic ingestion, schema validation, intra-batch and database deduplication, multilingual normalization, PII sanitization, and spam detection.
 - **Relational Source of Truth:** A structured PostgreSQL schema capturing feedback, upload jobs, themes, aspect sentiment, snapshots, releases, and insight evidence.
@@ -116,6 +127,7 @@ To provide complete transparency between active code and future roadmap items:
 | **Transparent Quality Scoring** | `backend/app/services/quality_scorer.py` | Decoupled `content_quality_score` and `metadata_completeness_score` (0.0 to 100.0) with guaranteed sentiment neutrality. |
 | **Batch Row-Level Locking** | `backend/app/services/feedback_cleaning.py` | PostgreSQL `SELECT ... FOR UPDATE SKIP LOCKED` for concurrent workers with fallback for SQLite testing. |
 | **Automated Test Suite** | `backend/tests/` | 88 automated pytest unit and integration tests passing with 100% pass rate. |
+| **Web App** | `frontend/` | React 19, TypeScript, and Vite landing page plus a console for the live health, feedback, ingestion, and quality APIs. |
 
 ### ⏳ Planned Capabilities (In Active Design & Development)
 
@@ -124,7 +136,6 @@ To provide complete transparency between active code and future roadmap items:
 - **Theme Discovery & Trend Engine:** Semantic clustering, recurring/emerging theme flags, sentiment velocity over time, and release before/after correlation.
 - **Hindsight Persistent Memory Integration (Part 9):** Episodic, semantic, and temporal memory synchronization with source ID provenance.
 - **Evidence-Backed Insight Synthesizer:** Rule-governed recommendation engine requiring underlying database citations before generating insights.
-- **Frontend Dashboard:** Interactive user interface built with React, Vite, TailwindCSS, and Plotly visualization.
 
 ---
 
@@ -275,10 +286,11 @@ The integration with **Hindsight** provides the agent with human-like memory acr
 - **Tertiary Provider:** xAI Grok direct API (`grok-4.7`)
 - **Persistent Memory:** Hindsight API
 
-### Frontend (Planned)
-- **Framework:** React 18+ with Vite
-- **Styling:** TailwindCSS
-- **Visualizations:** Plotly.js / React-Plotly
+### Frontend
+- **Framework:** React 19 with TypeScript and Vite
+- **Routing:** React Router
+- **Styling:** Tailwind CSS 4
+- **Motion:** Motion (Framer Motion)
 
 ---
 
@@ -563,6 +575,7 @@ Feedback/
 │   ├── .env.example                # Template configuration file
 │   ├── alembic.ini                 # Alembic configuration
 │   └── requirements.txt            # Python dependencies
+├── frontend/                       # React + Vite landing page and API console
 ├── .gitignore                      # Git ignore patterns
 └── README.md                       # Root documentation
 ```
@@ -574,8 +587,20 @@ Feedback/
 ### Prerequisites
 
 - **Python:** 3.11 or newer (`python --version`)
+- **Node.js:** 18 or newer, for the frontend
 - **PostgreSQL:** Version 15+ (Required for persistent production usage; SQLite is supported for local tests)
 - **PowerShell:** PowerShell 5.1+ (Windows) or standard bash shell (macOS/Linux)
+
+### Frontend
+
+From `frontend/`:
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173). The landing page loads on its own. `/console` calls the API, so start the backend in the steps below before using it.
 
 ---
 
@@ -751,7 +776,7 @@ pytest -v
 [Part 8 & 9: Hindsight Persistent Memory & Research Agent] (Upcoming)
         │
         ▼
-[Part 10: Frontend UI (React + Vite) & Production Deployment] (Upcoming)
+[Part 10: Frontend UI (React + Vite) & Production Deployment] (Landing page and API console in place)
 ```
 
 - [x] **Part 1:** Backend Foundation, FastAPI Factory, Settings & Logging
@@ -765,7 +790,7 @@ pytest -v
 - [ ] **Part 7:** Product Change Correlation & Evidence-Backed Recommendation Engine
 - [ ] **Part 8:** AI Research Agent & Memory-Augmented Natural Language Q&A
 - [ ] **Part 9:** Deep Hindsight Integration (Episodic, Semantic & Temporal Recall)
-- [ ] **Part 10:** Frontend Dashboard (React, Vite, Plotly) & Production Deployment
+- [x] **Part 10:** Frontend landing page and API console (React, Vite, TypeScript). Production deployment is still ahead.
 
 ---
 
