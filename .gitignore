@@ -1,55 +1,24 @@
-# Environments
-venv/
-.venv/
-env/
-backend/venv/
-backend/.venv/
-
-# Environment files
-.env
-backend/.env
-*.env.local
-
-# Python cache
-__pycache__/
-*.py[cod]
-.pytest_cache/
-
-# IDE
-.vscode/
-.idea/
-
 # Logs
+logs
 *.log
-logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Local databases
-*.db
-*.sqlite
-*.sqlite3
+node_modules
+dist
+dist-ssr
+*.local
 
-# Coverage and test artifacts
-.coverage
-htmlcov/
-.tox/
-
-# Environment files
-.env.*
-!.env.example
-!**/.env.example
-
-# Local databases
-*.db
-*.sqlite
-*.sqlite3
-
-# Test artifacts
-.coverage
-htmlcov/
-.tox/
-
-# Node.js dependencies and generated frontend builds
-node_modules/
-dist/
-frontend/node_modules/
-frontend/dist/
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
