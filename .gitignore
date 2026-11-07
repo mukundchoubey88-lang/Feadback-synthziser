@@ -15,6 +15,13 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
 # IDE
 .vscode/
 .idea/
@@ -47,3 +54,11 @@ htmlcov/
 .coverage
 htmlcov/
 .tox/
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

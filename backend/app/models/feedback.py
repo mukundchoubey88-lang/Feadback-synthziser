@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from app.models.theme import Theme
     from app.models.sentiment import SentimentHistory
     from app.models.insight import Insight, InsightEvidence
+    from app.models.classification import FeedbackClassification
 
 
 class FeedbackThemes(Base):
@@ -77,10 +78,15 @@ class Feedback(Base):
             "processing_status IN ('unprocessed', 'processing', 'processed', 'failed')",
             name="ck_feedback_processing_status",
         ),
+        CheckConstraint(
+            "classification_status IN ('pending', 'processing', 'completed', 'failed')",
+            name="ck_feedback_classification_status",
+        ),
         Index("ix_feedback_product_timestamp", "product", "timestamp"),
         Index("ix_feedback_product_feature", "product", "feature"),
         Index("ix_feedback_quality_status", "quality_status"),
         Index("ix_feedback_processing_status", "processing_status"),
+        Index("ix_feedback_classification_status", "classification_status"),
     )
 
     feedback_id: Mapped[uuid.UUID] = mapped_column(
@@ -208,6 +214,12 @@ class Feedback(Base):
         nullable=True,
         comment="Error details if cleaning pipeline failed",
     )
+    classification_status: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+        default="pending",
+        comment="Classification pipeline execution state: pending, processing, completed, failed",
+    )
 
     # Relationships
     feedback_themes: Mapped[List["FeedbackThemes"]] = relationship(
@@ -236,4 +248,10 @@ class Feedback(Base):
         secondary="insight_evidence",
         back_populates="feedbacks",
         viewonly=True,
+    )
+    classifications: Mapped[List["FeedbackClassification"]] = relationship(
+        "FeedbackClassification",
+        back_populates="feedback",
+        cascade="all, delete-orphan",
+        order_by="desc(FeedbackClassification.classified_at)",
     )

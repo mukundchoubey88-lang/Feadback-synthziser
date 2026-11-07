@@ -11,6 +11,7 @@ from app.models.product_change import ProductChanges
 from app.models.insight import Insight, InsightEvidence
 from app.models.memory import MemoryMetadata
 from app.models.upload_job import UploadJob
+from app.models.classification import FeedbackClassification
 
 __all__ = [
     "Feedback",
@@ -23,4 +24,5 @@ __all__ = [
     "InsightEvidence",
     "MemoryMetadata",
     "UploadJob",
+    "FeedbackClassification",
 ]

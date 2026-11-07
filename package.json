@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@splinetool/react-spline": "^4.2.0",
+    "@splinetool/runtime": "^2.0.151",
+    "gsap": "^3.15.1",
+    "lucide-react": "^1.70.0",
+    "motion": "^14.10.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^26.6.6"
+  },
+  "scripts": {}
+}
