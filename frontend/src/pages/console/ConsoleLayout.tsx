@@ -21,7 +21,10 @@ export function ConsoleLayout() {
             <span className="grid h-7 w-7 place-items-center bg-ink text-[13px] text-paper">S</span>
             <span className="text-[15px] tracking-[-0.03em]">Synthesizer</span>
           </Link>
-          <p className="hidden text-[13px] text-mute sm:block">Live console · {API_BASE}</p>
+          <p className="hidden items-center gap-1.5 text-[13px] text-mute sm:flex">
+            <span className="inline-block h-2 w-2 rounded-full bg-good animate-pulse-subtle" />
+            Live console • <span className="font-mono text-[12px]">{API_BASE}</span>
+          </p>
           <Link to="/" className="text-[13px] text-ink-soft hover:text-ink">
             Back to site
           </Link>

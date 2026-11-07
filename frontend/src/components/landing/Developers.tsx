@@ -60,8 +60,8 @@ export function Developers() {
                 {copied ? "Copied" : "Copy"}
               </button>
             </div>
-            <pre className="overflow-x-auto px-4 py-5 text-[13px] leading-relaxed text-ink">
-              <code>{snippet}</code>
+            <pre className="overflow-x-auto px-4 py-5 font-mono text-[13px] leading-relaxed text-ink">
+              <code className="font-mono">{snippet}</code>
             </pre>
           </div>
           {copyError && <p className="mt-3 text-[13px] text-bad">{copyError}</p>}

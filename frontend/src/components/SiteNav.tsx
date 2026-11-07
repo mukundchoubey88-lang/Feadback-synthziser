@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { ArrowRight, Menu, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 const links = [
   { href: "#platform", id: "platform", label: "Platform" },
@@ -75,10 +76,10 @@ export function SiteNav() {
         <div className="flex items-center gap-3">
           <NavLink
             to="/console"
-            className="hidden items-center gap-2 rounded-pill bg-ink px-4 py-2 text-[13px] text-paper transition-colors duration-200 hover:bg-ink-soft lg:inline-flex"
+            className="group hidden items-center gap-2 rounded-pill bg-ink px-4 py-2 text-[13px] text-paper transition-all duration-200 hover:bg-ink-soft active:scale-[0.98] lg:inline-flex"
           >
             Open console
-            <ArrowRight size={14} strokeWidth={1.75} />
+            <ArrowRight size={14} strokeWidth={1.75} className="transition-transform duration-200 group-hover:translate-x-0.5" />
           </NavLink>
           <button
             type="button"
@@ -92,8 +93,9 @@ export function SiteNav() {
           </button>
         </div>
       </div>
-      {open && (
-        <nav id="mobile-nav" className="border-t border-line px-5 py-4 lg:hidden" aria-label="Mobile">
+      <AnimatePresence>
+        {open && (
+          <motion.nav id="mobile-nav" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} className="border-t border-line px-5 py-4 lg:hidden" aria-label="Mobile">
           <div className="mx-auto grid max-w-[1180px] gap-1">
             {links.map((link) => (
               <a
@@ -113,11 +115,12 @@ export function SiteNav() {
               className="mt-3 inline-flex items-center justify-center gap-2 rounded-pill bg-ink px-4 py-3 text-center text-[14px] text-paper transition-colors duration-200 hover:bg-ink-soft"
             >
               Open console
-              <ArrowRight size={14} strokeWidth={1.75} />
+              <ArrowRight size={14} strokeWidth={1.75} className="transition-transform duration-200 group-hover:translate-x-0.5" />
             </NavLink>
           </div>
-        </nav>
-      )}
+        </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
