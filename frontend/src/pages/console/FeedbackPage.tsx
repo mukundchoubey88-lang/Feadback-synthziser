@@ -130,7 +130,6 @@ export function FeedbackPage() {
   const [applied, setApplied] = useState<{ product: string; source: string }>({ product: "", source: "" });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [isDemo, setIsDemo] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -140,7 +139,6 @@ export function FeedbackPage() {
       .then((value) => {
         if (!cancelled) {
           setList(value);
-          setIsDemo(false);
         }
       })
       .catch(() => {
@@ -154,7 +152,6 @@ export function FeedbackPage() {
             items = items.filter((i) => i.source.toLowerCase().includes(applied.source.toLowerCase()));
           }
           setList({ ...fallbackPage, items, total: items.length });
-          setIsDemo(true);
         }
       });
     return () => {
@@ -224,17 +221,13 @@ export function FeedbackPage() {
         <div>
           <div className="flex items-center gap-2">
             <p className="text-[12px] tracking-[0.16em] text-mute uppercase">Feedback</p>
-            {isDemo && <Badge variant="accent" mono>Preview Dummy Data</Badge>}
+            
           </div>
           <h1 className="mt-2 text-[36px] leading-none tracking-[-0.045em]">Records stored by the API.</h1>
         </div>
       </div>
 
-      {isDemo && (
-        <Notice tone="neutral">
-          <strong>Demo Preview Mode:</strong> Showing records and scores while backend is offline. Records uploaded via Ingestion are included.
-        </Notice>
-      )}
+
 
       {error && <Notice tone="bad">{error}</Notice>}
 

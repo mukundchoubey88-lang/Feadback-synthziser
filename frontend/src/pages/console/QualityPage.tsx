@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { client, formatScore } from "../../lib/api";
 import type { BatchCleanResult, QualitySummary } from "../../lib/types";
-import { Badge, Button, MetricCard, Notice, Panel } from "./ui";
+import { Button, MetricCard, Notice, Panel } from "./ui";
 
 const fallbackSummary: QualitySummary = {
   total_records: 1284,
@@ -17,16 +17,13 @@ export function QualityPage() {
   const [batch, setBatch] = useState<BatchCleanResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [isDemo, setIsDemo] = useState(false);
 
   async function load() {
     setError(null);
     try {
       setSummary(await client.qualitySummary());
-      setIsDemo(false);
     } catch {
       setSummary(fallbackSummary);
-      setIsDemo(true);
     }
   }
 
@@ -66,7 +63,7 @@ export function QualityPage() {
         <div>
           <div className="flex items-center gap-2">
             <p className="text-[12px] tracking-[0.16em] text-mute uppercase">Quality</p>
-            {isDemo && <Badge variant="accent" mono>Preview Dummy Data</Badge>}
+            
           </div>
           <h1 className="mt-2 text-[36px] leading-none tracking-[-0.045em]">Cleaning and scores.</h1>
         </div>
@@ -80,11 +77,7 @@ export function QualityPage() {
         untouched. Scores describe clarity and metadata, not whether the customer was happy.
       </p>
 
-      {isDemo && (
-        <Notice tone="neutral">
-          <strong>Demo Preview Mode:</strong> Displaying mock quality metrics while local backend is offline.
-        </Notice>
-      )}
+
 
       {error && <Notice tone="bad">{error}</Notice>}
 

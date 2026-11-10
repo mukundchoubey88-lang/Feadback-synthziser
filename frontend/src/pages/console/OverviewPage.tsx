@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { client, formatScore, formatWhen } from "../../lib/api";
 import type { FeedbackPage, FeedbackRecord, HealthResponse, QualitySummary, RootInfo } from "../../lib/types";
-import { Badge, EmptyState, MetricCard, Notice, Panel } from "./ui";
+import { Badge, EmptyState, MetricCard, Panel } from "./ui";
 
 function statusVariant(status?: string | null): "good" | "warn" | "bad" | "neutral" {
   if (!status) return "neutral";
@@ -119,7 +119,6 @@ export function OverviewPage() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [summary, setSummary] = useState<QualitySummary | null>(null);
   const [feedback, setFeedback] = useState<FeedbackPage | null>(null);
-  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -137,7 +136,6 @@ export function OverviewPage() {
           setHealth(h);
           setSummary(s);
           setFeedback(f);
-          setIsDemoMode(false);
         }
       } catch {
         if (!cancelled) {
@@ -145,7 +143,6 @@ export function OverviewPage() {
           setHealth(fallbackHealth);
           setSummary(fallbackSummary);
           setFeedback(fallbackFeedback);
-          setIsDemoMode(true);
         }
       }
     };
@@ -163,7 +160,7 @@ export function OverviewPage() {
         <div>
           <div className="flex items-center gap-2">
             <p className="text-[12px] tracking-[0.16em] text-mute uppercase">Overview</p>
-            {isDemoMode && <Badge variant="accent" mono>Preview Dummy Data</Badge>}
+            
           </div>
           <h1 className="mt-2 text-[36px] leading-none tracking-[-0.045em]">What the API can show right now.</h1>
           <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
@@ -173,12 +170,7 @@ export function OverviewPage() {
         </div>
       </div>
 
-      {isDemoMode && (
-        <Notice tone="neutral">
-          <strong>Demo Preview Mode:</strong> The local FastAPI backend at <code>http://127.0.0.1:8000</code> is offline,
-          so this console is displaying dummy data to preview features and layout.
-        </Notice>
-      )}
+
 
       <motion.div
         className="grid gap-3 md:grid-cols-3"

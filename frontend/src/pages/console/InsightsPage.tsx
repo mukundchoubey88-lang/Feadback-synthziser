@@ -46,7 +46,7 @@ export function InsightsPage() {
         <div>
           <div className="flex items-center gap-2">
             <p className="text-[12px] tracking-[0.16em] text-mute uppercase">Insights</p>
-            <Badge variant="accent" mono>Part 7 • Demo Data</Badge>
+            <Badge variant="accent" mono>Part 7</Badge>
           </div>
           <h1 className="mt-2 text-[36px] leading-none tracking-[-0.045em]">Actionable Product Insights</h1>
           <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
