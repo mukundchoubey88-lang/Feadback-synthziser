@@ -6,7 +6,8 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-336791.svg?logo=postgresql&logoColor=white)](https://www.postgresql.org)
 [![pgvector](https://img.shields.io/badge/pgvector-0.5+-green.svg)](https://github.com/pgvector/pgvector)
 [![Google Gemini API](https://img.shields.io/badge/Gemini_Embedding-2-4285F4.svg?logo=google&logoColor=white)](https://ai.google.dev/)
-[![Tests Passing](https://img.shields.io/badge/tests-244%20passed-brightgreen.svg)](https://docs.pytest.org/)
+[![Memory: Hindsight](https://img.shields.io/badge/memory-Hindsight-8A2BE2.svg)](https://github.com/mukundchoubey88-lang/Feadback-synthziser)
+[![Tests Passing](https://img.shields.io/badge/tests-279%20passed-brightgreen.svg)](https://docs.pytest.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 An asynchronous, production-conscious intelligence backend that ingests noisy multi-channel customer feedback, cleans and redacts PII, performs multi-topic aspect sentiment classification via LLM orchestration, generates 768-dimensional semantic embeddings, and groups customer feedback into deterministic problem themes using pure agglomerative hierarchical clustering.
@@ -105,7 +106,8 @@ flowchart TD
 | **HTTP Client** | HTTPX | 0.27+ | Asynchronous non-blocking HTTP requests for LLM APIs |
 | **Embeddings Model** | Gemini Embedding 2 | 768D | Google DeepMind's flagship dense text vector model |
 | **AI LLMs** | Gemini 2.0 / Grok / Claude | Multi | Multi-topic classification, aspect sentiment, intent detection |
-| **Testing** | Pytest & AnyIO | 8.2+ | Unit, integration, regression, and transaction testing (244 tests) |
+| **Long-Term Memory** | Hindsight | Cloud / Self-hosted | Episodic, semantic & temporal persistent memory for historical reasoning |
+| **Testing** | Pytest & AnyIO | 8.2+ | Unit, integration, regression, and transaction testing (279 tests) |
 
 ---
 
@@ -368,6 +370,109 @@ flowchart LR
 | **II. Cognitive Classification** | • Multi-topic categorization with confidence thresholds<br>• Aspect-level sentiment extraction (positive, negative, neutral, mixed)<br>• Multi-provider failover orchestration with circuit breaking | LLM grounding, fault tolerance, cost management |
 | **III. Vector & Theme Intelligence** | • 768-dimensional dense vector embeddings (`gemini-embedding-2`)<br>• Idempotent SHA-256 hash caching to eliminate duplicate API costs<br>• Pure-Python agglomerative average-linkage clustering ($O(N^2 \log N)$)<br>• Medoid representative extraction & centroid calculation<br>• Theme lifecycle management (review, activation, DAG merge & split) | Mathematical determinism, zero C-dependencies, DAG cycle prevention |
 | **IV. Temporal Synthesis & Memory** | • Velocity tracking and z-score anomaly detection for emerging issues<br>• Correlation of feedback shifts with product deployments and releases<br>• Persistent temporal memory (Hindsight integration) for historical reasoning<br>• Autonomous agentic Q&A interface for product researchers | Longitudinal insights, predictive alerting, agentic reasoning |
+
+---
+
+## 🧠 Hindsight Persistent Memory: Where and Why It Is Used
+
+### 1. The Core Problem: Why Standard Vector Search & LLMs Aren't Enough
+Standard feedback analytics tools and naive vector RAG pipelines suffer from **temporal amnesia**:
+- **Semantic Similarity $\neq$ Temporal Understanding:** A cosine similarity search between customer quotes can find semantically close complaints, but it cannot answer:
+  - *"Did customer sentiment about checkout latency improve or worsen following release v2.4.0?"*
+  - *"Is this payment failure ticket an isolated anomaly or the continuation of an unresolved issue from last quarter?"*
+  - *"What actions did engineering take the last time search complaints spiked, and did they resolve the issue?"*
+- **LLM Context Window Limits & Session Loss:** Large Language Models analyze feedback in fleeting conversational context windows. When a new batch arrives next week, the agent loses the narrative arc of previous releases.
+
+**Hindsight** is integrated as the **dedicated, long-term contextual memory engine** for the Feedback Intelligence Agent. It gives the AI agent continuous historical memory across sprints, deployments, and quarters.
+
+```
+                    ┌─────────────────────────────────────────────────┐
+                    │          Customer Feedback Streams              │
+                    │      (App Reviews, Support, Surveys)            │
+                    └────────────────────────┬────────────────────────┘
+                                             │
+                                             ▼
+                    ┌─────────────────────────────────────────────────┐
+                    │        PostgreSQL: Authoritative Source         │
+                    │   feedback │ themes │ snapshots │ releases      │
+                    └────────────┬────────────────────────┬───────────┘
+                                 │                        │
+       Bi-directional Provenance │                        │ Historical Retrieval
+       via memory_metadata Table │                        │ During Q&A & Analysis
+                                 ▼                        ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       HINDSIGHT PERSISTENT MEMORY ENGINE                    │
+│                                                                             │
+│  1. Episodic Memory          2. Semantic Memory         3. Temporal Memory  │
+│  ┌───────────────────────┐   ┌──────────────────────┐   ┌─────────────────┐ │
+│  │ "In Sept 2026, 42     │   │ "Checkout latency is │   │ "Checkout issue │ │
+│  │ users reported 504    │──►│ historically the top │──►│ declined 68%    │ │
+│  │ Gateway Timeouts      │   │ churn driver for     │   │ post-v2.5, but  │ │
+│  │ after v2.4.0 rollout" │   │ Android mobile users"│   │ card errors rose│ │
+│  └───────────────────────┘   └──────────────────────┘   └─────────────────┘ │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                                       ▼
+                    ┌─────────────────────────────────────────────────┐
+                    │    Autonomous Feedback Research Agent (Chat)    │
+                    │   Evidence-backed answers to PM & Eng queries   │
+                    └─────────────────────────────────────────────────┘
+```
+
+---
+
+### 2. The Three Memory Tiers in Hindsight
+
+| Memory Tier | What It Captures | Real-World Example |
+| :--- | :--- | :--- |
+| **Episodic Memory** | Specific, discrete occurrences, release events, and notable customer friction spikes linked to exact points in time. | *"On October 12, 2026, 38 enterprise users reported export timeouts following deployment v2.4.1."* |
+| **Semantic Memory** | Generalized, synthesized product domain knowledge distilled from repeated feedback themes over months. | *"Export timeouts on the Analytics Portal are consistently associated with large datasets exceeding 50,000 rows."* |
+| **Temporal Memory** | Longitudinal trajectories, issue resolution timelines, and before/after comparisons around product deployments. | *"Export complaints declined by 82% over the 3 weeks following the async export patch released on October 20."* |
+
+---
+
+### 3. Where Hindsight Is Implemented in the Codebase
+
+Hindsight integration is woven through the entire architecture:
+
+#### A. Database Schema Layer (`backend/app/models/memory.py`)
+The `memory_metadata` table establishes a **bi-directional provenance link** between PostgreSQL records and Hindsight memory documents:
+- **`bank_id`:** Logical workspace or product bank in Hindsight (e.g. `storefront_mobile`, `analytics_portal`).
+- **`hindsight_memory_id`:** Unique external document identifier returned by the Hindsight memory engine.
+- **`memory_type`:** Tier classification: `episodic`, `semantic`, or `temporal`.
+- **`source_entity_type` & `source_entity_id`:** Explicit polymorphic link to the upstream entity:
+  - `feedback` $\to$ specific high-signal raw customer feedback record
+  - `theme` $\to$ extracted theme topic
+  - `release` $\to$ product release entry in `product_changes`
+  - `insight` $\to$ AI-generated executive recommendation
+- **`content_summary`:** Distilled text representation retained in the memory document.
+- **`sync_status` & `last_synced_at`:** Tracks replication state (`pending`, `synced`, `failed`) with automatic retry reconciliation.
+
+#### B. Centralized Configuration (`backend/app/core/config.py`)
+- **`HINDSIGHT_API_KEY`:** Secure bearer credentials for authenticating with the Hindsight service.
+- **`HINDSIGHT_BASE_URL`:** Cluster URL or local proxy endpoint (e.g., `https://api.hindsight.ai` or internal sidecar).
+- Validated via Pydantic Settings with automatic whitespace trimming and environment variable overrides.
+
+#### C. Integrations Layer (`backend/app/integrations/hindsight/`)
+- Encapsulates HTTP communication with Hindsight's memory APIs:
+  - Memory ingestion: writing verified theme milestones and release events.
+  - Contextual retrieval: searching memories by product bank, semantic query, and time window.
+  - Memory reconciliation: updating or invalidating outdated beliefs when new customer evidence contradicts past assumptions.
+
+#### D. Autonomous Research Agent (`/api/memory/search` & `/api/agent/chat`)
+- Powers natural language Q&A for product managers, engineering leads, and support teams:
+  - *"Have users reported payment issues before this sprint?"*
+  - *"What was the customer reaction to our v2.3 redesign?"*
+  - The agent queries Hindsight to retrieve historical episodic memories, correlates them with current PostgreSQL metrics, and generates cited, evidence-backed answers.
+
+---
+
+### 4. Architectural Safeguard: PostgreSQL Remains the Source of Truth
+
+To ensure enterprise-grade reliability and regulatory compliance:
+1. **Never a Single Point of Failure:** If the Hindsight service experiences temporary downtime or network latency, the core platform continues functioning with 100% availability. Ingestion, PII redaction, AI classification, embeddings, and SQL analytics never halt.
+2. **PostgreSQL as Hard Grounding:** Every claim recalled from Hindsight must be backed by traceable primary keys in PostgreSQL. The agent never invents metrics; numbers, counts, and dates are always validated against relational tables.
+3. **Selective Curation:** Raw, unvetted feedback is **never** dumped indiscriminately into long-term memory. Only verified clusters, validated release milestones, and aggregated theme snapshots are persisted.
 
 ---
 
