@@ -163,6 +163,10 @@ Feedback/
 │   ├── requirements.txt            # Python dependencies
 │   └── .env.example                # Environment configuration template
 │
+├── frontend/                       # Frontend web console application
+│   ├── src/                        # React / Vite components & analytics views
+│   └── package.json
+│
 └── README.md                       # Repository Documentation
 ```
 
@@ -179,8 +183,8 @@ Feedback/
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/Feedback-Intelligence-Agent.git
-cd Feedback-Intelligence-Agent/backend
+git clone https://github.com/mukundchoubey88-lang/Feadback-synthziser.git
+cd Feadback-synthziser/backend
 
 # Create and activate virtual environment
 python -m venv venv
@@ -319,17 +323,51 @@ Evaluated with synthetic unit-normalized 768-dimensional vectors on standard CPU
 
 ---
 
-## 🗺️ Project Roadmap
+## 🗺️ Platform Capability & Architecture Map
 
-- [x] **Part 1–3:** Streaming Ingestion & Database Foundations (FastAPI, PostgreSQL, Alembic)
-- [x] **Part 4:** Data Cleaning, Quality Gatekeeping & PII Sanitization Engine
-- [x] **Part 5–6:** Multi-Provider AI Classification & Evidence-Grounded Aspect Sentiment
-- [x] **Part 7 (Step 1–3):** `gemini-embedding-2` Provider, Database Persistence & SHA-256 Caching
-- [x] **Part 7 (Step 4):** Deterministic Agglomerative Theme Clustering Engine
-- [ ] **Part 7 (Step 5):** Theme Lifecycle Management (Activation, Review, DAG Merge & Split)
-- [ ] **Part 8:** Emerging & Declining Theme Detection (Velocity & Z-Score Anomaly Tracking)
-- [ ] **Part 9:** Hindsight Persistent Memory Integration (Temporal Product Intelligence)
-- [ ] **Part 10:** Autonomous Feedback Intelligence Agent (Natural Language Research Assistant)
+The platform is designed around four cohesive engineering pillars that transform unstructured raw feedback into structured product intelligence:
+
+```mermaid
+flowchart LR
+    subgraph P1 ["Pillar I: Ingestion & Trust"]
+        direction TB
+        I1["Multi-Channel Streaming (CSV / JSON)"]
+        I2["Automated PII Redaction & Sanitization"]
+        I3["Quality Scoring & Spam Detection"]
+    end
+
+    subgraph P2 ["Pillar II: AI Classification"]
+        direction TB
+        C1["Multi-Topic Taxonomy Classification"]
+        C2["Aspect-Based Sentiment & Intensity"]
+        C3["Tiered Failover (Gemini / Claude / Grok)"]
+    end
+
+    subgraph P3 ["Pillar III: Vector & Theme Intelligence"]
+        direction TB
+        V1["768D Dense Embeddings (Gemini 2)"]
+        V2["Deterministic SHA-256 Cost Caching"]
+        V3["Agglomerative Theme Clustering (UPGMA)"]
+        V4["Theme Lifecycle & Lineage DAG"]
+    end
+
+    subgraph P4 ["Pillar IV: Temporal Memory & Agentic Synthesis"]
+        direction TB
+        M1["Emerging & Declining Issue Detection"]
+        M2["Product Release Correlation"]
+        M3["Hindsight Temporal Persistent Memory"]
+        M4["Autonomous Feedback Research Agent"]
+    end
+
+    P1 --> P2 --> P3 --> P4
+```
+
+| Platform Pillar | Core Capabilities | Engineering Focus |
+| :--- | :--- | :--- |
+| **I. Data Ingestion & Trust** | • Streaming 64KB chunk parser with 10MB bounds<br>• Automated regex PII redaction (email, phone, credit card, IP, SSN)<br>• Deterministic spam filtering & data quality scoring | High throughput, memory safety, privacy compliance |
+| **II. Cognitive Classification** | • Multi-topic categorization with confidence thresholds<br>• Aspect-level sentiment extraction (positive, negative, neutral, mixed)<br>• Multi-provider failover orchestration with circuit breaking | LLM grounding, fault tolerance, cost management |
+| **III. Vector & Theme Intelligence** | • 768-dimensional dense vector embeddings (`gemini-embedding-2`)<br>• Idempotent SHA-256 hash caching to eliminate duplicate API costs<br>• Pure-Python agglomerative average-linkage clustering ($O(N^2 \log N)$)<br>• Medoid representative extraction & centroid calculation<br>• Theme lifecycle management (review, activation, DAG merge & split) | Mathematical determinism, zero C-dependencies, DAG cycle prevention |
+| **IV. Temporal Synthesis & Memory** | • Velocity tracking and z-score anomaly detection for emerging issues<br>• Correlation of feedback shifts with product deployments and releases<br>• Persistent temporal memory (Hindsight integration) for historical reasoning<br>• Autonomous agentic Q&A interface for product researchers | Longitudinal insights, predictive alerting, agentic reasoning |
 
 ---
 
