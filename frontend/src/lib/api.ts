@@ -1,11 +1,26 @@
 import type {
+  AnalyticsOverview,
+  AspectSentimentResult,
   BatchCleanResult,
+  CustomerIntentResult,
+  FeedbackClassificationDetail,
+  FeedbackCreateInput,
   FeedbackPage,
   FeedbackRecord,
+  FeedbackVolumeResult,
   HealthResponse,
+  HistoricalIntelligenceResult,
+  MemoryRecallResult,
+  MemoryReflectResult,
+  MemoryStatusResult,
+  MemorySyncResult,
   QualityInspection,
   QualitySummary,
   RootInfo,
+  SentimentTrendsResult,
+  ThemeAnalyticsResult,
+  ThemeDiscoverResult,
+  ThemeRecord,
   UploadJob,
   UploadResult,
 } from "./types";
@@ -75,8 +90,11 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const client = {
+  // --- Root & Health ---
   root: () => api<RootInfo>("/"),
   health: () => api<HealthResponse>("/api/health"),
+
+  // --- Feedback Ingestion & Quality ---
   feedback: (params: { page?: number; page_size?: number; product?: string; source?: string }) => {
     const query = new URLSearchParams();
     query.set("page", String(params.page ?? 1));
@@ -86,6 +104,12 @@ export const client = {
     return api<FeedbackPage>(`/api/feedback?${query.toString()}`);
   },
   feedbackById: (id: string) => api<FeedbackRecord>(`/api/feedback/${id}`),
+  createFeedback: (payload: FeedbackCreateInput) =>
+    api<FeedbackRecord>("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }),
   quality: (id: string) => api<QualityInspection>(`/api/feedback/${id}/quality`),
   qualitySummary: (product?: string) => {
     const query = product ? `?product=${encodeURIComponent(product)}` : "";
@@ -100,6 +124,126 @@ export const client = {
   cleanBatch: (limit = 50) =>
     api<BatchCleanResult>(`/api/feedback/clean?limit=${limit}&reprocess=false`, { method: "POST" }),
   cleanOne: (id: string) => api<FeedbackRecord>(`/api/feedback/${id}/clean`, { method: "POST" }),
+
+  // --- Classification & Sentiment (Part 6) ---
+  classification: (feedbackId: string) =>
+    api<FeedbackClassificationDetail>(`/api/feedback/${feedbackId}/classification`),
+  classifyOne: (feedbackId: string, reprocess = false) =>
+    api<FeedbackClassificationDetail>(`/api/feedback/${feedbackId}/classify?reprocess=${reprocess}`, {
+      method: "POST",
+    }),
+
+  // --- Theme Discovery & Lifecycle (Part 7) ---
+  themes: (params?: { product?: string; status?: string; category?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.product) query.set("product", params.product);
+    if (params?.status) query.set("status", params.status);
+    if (params?.category) query.set("category", params.category);
+    const qs = query.toString();
+    return api<ThemeRecord[]>(`/api/themes${qs ? `?${qs}` : ""}`);
+  },
+  themeById: (themeId: string) => api<ThemeRecord>(`/api/themes/${themeId}`),
+  discoverThemes: (payload: {
+    product: string;
+    similarity_threshold?: number;
+    min_cluster_size?: number;
+    batch_size?: number;
+    force_recluster?: boolean;
+  }) =>
+    api<ThemeDiscoverResult>("/api/themes/discover", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }),
+  activateTheme: (themeId: string) =>
+    api<ThemeRecord>(`/api/themes/${themeId}/activate`, { method: "POST" }),
+  discardTheme: (themeId: string) =>
+    api<ThemeRecord>(`/api/themes/${themeId}/discard`, { method: "POST" }),
+  mergeThemes: (sourceThemeId: string, targetThemeId: string) =>
+    api<ThemeRecord>(`/api/themes/${sourceThemeId}/merge`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ target_theme_id: targetThemeId }),
+    }),
+
+  // --- Sentiment & Temporal Analytics (Part 8) ---
+  analyticsOverview: (params?: { product?: string; days?: number; start_date?: string; end_date?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.product) query.set("product", params.product);
+    if (params?.days) query.set("days", String(params.days));
+    if (params?.start_date) query.set("start_date", params.start_date);
+    if (params?.end_date) query.set("end_date", params.end_date);
+    const qs = query.toString();
+    return api<AnalyticsOverview>(`/api/analytics/overview${qs ? `?${qs}` : ""}`);
+  },
+  sentimentTrends: (params?: { product?: string; days?: number; start_date?: string; end_date?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.product) query.set("product", params.product);
+    if (params?.days) query.set("days", String(params.days));
+    if (params?.start_date) query.set("start_date", params.start_date);
+    if (params?.end_date) query.set("end_date", params.end_date);
+    const qs = query.toString();
+    return api<SentimentTrendsResult>(`/api/analytics/sentiment-trends${qs ? `?${qs}` : ""}`);
+  },
+  aspectSentiment: (params?: { product?: string; days?: number; limit?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.product) query.set("product", params.product);
+    if (params?.days) query.set("days", String(params.days));
+    if (params?.limit) query.set("limit", String(params.limit));
+    const qs = query.toString();
+    return api<AspectSentimentResult>(`/api/analytics/aspects${qs ? `?${qs}` : ""}`);
+  },
+  themeAnalytics: (params?: { product?: string; days?: number; limit?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.product) query.set("product", params.product);
+    if (params?.days) query.set("days", String(params.days));
+    if (params?.limit) query.set("limit", String(params.limit));
+    const qs = query.toString();
+    return api<ThemeAnalyticsResult>(`/api/analytics/themes${qs ? `?${qs}` : ""}`);
+  },
+  customerIntents: (params?: { product?: string; days?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.product) query.set("product", params.product);
+    if (params?.days) query.set("days", String(params.days));
+    const qs = query.toString();
+    return api<CustomerIntentResult>(`/api/analytics/intents${qs ? `?${qs}` : ""}`);
+  },
+  feedbackVolume: (params?: { product?: string; period_days?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.product) query.set("product", params.product);
+    if (params?.period_days) query.set("period_days", String(params.period_days));
+    const qs = query.toString();
+    return api<FeedbackVolumeResult>(`/api/analytics/volume${qs ? `?${qs}` : ""}`);
+  },
+
+  // --- Hindsight Persistent Memory (Part 9) ---
+  memoryStatus: () => api<MemoryStatusResult>("/api/memory/status"),
+  memorySync: (payload: { product: string; dry_run?: boolean }) =>
+    api<MemorySyncResult>("/api/memory/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }),
+  memoryRecall: (payload: { product: string; query: string; limit?: number }) =>
+    api<MemoryRecallResult>("/api/memory/recall", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }),
+  memoryReflect: (payload: { product: string; query: string }) =>
+    api<MemoryReflectResult>("/api/memory/reflect", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }),
+
+  // --- Historical Memory Intelligence Q&A (Part 10) ---
+  askIntelligence: (payload: { product: string; question: string }) =>
+    api<HistoricalIntelligenceResult>("/api/intelligence/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }),
 };
 
 export function formatWhen(value: string | null | undefined): string {

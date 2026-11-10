@@ -1,18 +1,23 @@
+import { useState } from "react";
 import { NavLink, Outlet, Link } from "react-router-dom";
+import { MessageSquare } from "lucide-react";
 import { API_BASE } from "../../lib/api";
+import AgentPanel from "../../components/AgentPanel";
 
 const items = [
   { to: "/console", label: "Overview", end: true },
   { to: "/console/feedback", label: "Feedback" },
   { to: "/console/ingestion", label: "Ingestion" },
   { to: "/console/quality", label: "Quality" },
-  { to: "/console/themes", label: "Themes", planned: true },
-  { to: "/console/insights", label: "Insights", planned: true },
-  { to: "/console/memory", label: "Intelligence Memory", planned: true },
-  { to: "/console/reports", label: "Reports", planned: true },
+  { to: "/console/themes", label: "Themes" },
+  { to: "/console/insights", label: "Insights" },
+  { to: "/console/memory", label: "Intelligence Memory" },
+  { to: "/console/reports", label: "Reports" },
 ];
 
 export function ConsoleLayout() {
+  const [agentOpen, setAgentOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-paper text-ink">
       <header className="border-b border-line">
@@ -21,13 +26,22 @@ export function ConsoleLayout() {
             <span className="grid h-7 w-7 place-items-center bg-ink text-[13px] text-paper">S</span>
             <span className="text-[15px] tracking-[-0.03em]">Synthesizer</span>
           </Link>
-          <p className="hidden items-center gap-1.5 text-[13px] text-mute sm:flex">
-            <span className="inline-block h-2 w-2 rounded-full bg-good animate-pulse-subtle" />
-            Live console • <span className="font-mono text-[12px]">{API_BASE}</span>
-          </p>
-          <Link to="/" className="text-[13px] text-ink-soft hover:text-ink">
-            Back to site
-          </Link>
+          <div className="flex items-center gap-4">
+            <p className="hidden items-center gap-1.5 text-[13px] text-mute sm:flex">
+              <span className="inline-block h-2 w-2 rounded-full bg-good animate-pulse-subtle" />
+              Live console • <span className="font-mono text-[12px]">{API_BASE}</span>
+            </p>
+            <button
+              onClick={() => setAgentOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-ink text-paper text-xs font-medium rounded-xs hover:bg-ink/90 transition-colors shadow-xs"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>Ask AI Agent</span>
+            </button>
+            <Link to="/" className="text-[13px] text-ink-soft hover:text-ink">
+              Back to site
+            </Link>
+          </div>
         </div>
       </header>
       <div className="mx-auto grid max-w-[1240px] lg:grid-cols-[220px_1fr]">
@@ -46,7 +60,6 @@ export function ConsoleLayout() {
                 }
               >
                 <span>{item.label}</span>
-                {item.planned && <span className="text-[10px] tracking-[0.12em] uppercase opacity-70">Soon</span>}
               </NavLink>
             ))}
           </nav>
@@ -55,6 +68,8 @@ export function ConsoleLayout() {
           <Outlet />
         </main>
       </div>
+
+      <AgentPanel isOpen={agentOpen} onClose={() => setAgentOpen(false)} />
     </div>
   );
 }

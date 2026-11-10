@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     """Centralized application settings loaded from environment and .env."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", "backend/.env"),
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",
@@ -33,6 +33,10 @@ class Settings(BaseSettings):
 
     XAI_API_KEY: Optional[str] = None
     XAI_MODEL: str = "grok-4.7"
+
+    # Groq Cloud AI Provider Settings
+    GROQ_API_KEY: Optional[str] = None
+    GROQ_MODEL: str = "qwen/qwen3.8-27b"
 
     AI_PRIMARY_PROVIDER: str = "gemini"
     AI_PROVIDER_FALLBACK_ENABLED: bool = True
@@ -66,7 +70,7 @@ class Settings(BaseSettings):
     MAX_CLASSIFICATION_BATCH_SIZE: int = 50  # Bounded batch size for AI classification
 
     # CORS Configuration
-    CORS_ORIGINS: str = "http://localhost:5173"
+    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000"
 
     @property
     def ai_provider_priority_list(self) -> List[str]:
@@ -100,6 +104,7 @@ class Settings(BaseSettings):
         "GEMINI_API_KEY",
         "OPENROUTER_API_KEY",
         "XAI_API_KEY",
+        "GROQ_API_KEY",
         "HINDSIGHT_API_KEY",
         "HINDSIGHT_BASE_URL",
         mode="before",

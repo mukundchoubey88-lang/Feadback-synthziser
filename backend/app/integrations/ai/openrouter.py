@@ -45,6 +45,8 @@ STRUCTURED_OUTPUT_CAPABLE_MODELS = {
     "openai/gpt-4o",
     "meta-llama/llama-3.3-70b-instruct",
     "mistralai/mistral-large-2407",
+    "xiaomi/mimo-v2.6-flash",
+    "xiaomi/mimo-v2.6-pro",
 }
 
 
@@ -231,7 +233,7 @@ class OpenRouterProvider(BaseAIProvider):
 
         # Only pass models array if more than 1 model is specified or fallbacks exist
         if len(models_list) > 1 or self.fallback_models:
-            payload["models"] = models_list
+            payload["models"] = models_list[:3]
 
         if request.max_output_tokens:
             payload["max_tokens"] = request.max_output_tokens

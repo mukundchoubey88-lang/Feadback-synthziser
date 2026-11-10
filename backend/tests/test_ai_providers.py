@@ -29,6 +29,7 @@ from app.integrations.ai.exceptions import (
 )
 from app.integrations.ai.gemini import GeminiProvider
 from app.integrations.ai.grok import GrokProvider
+from app.integrations.ai.groq import GroqProvider
 from app.integrations.ai.manager import AIProviderManager
 from app.integrations.ai.openrouter import OpenRouterProvider
 from app.integrations.ai.schemas import AIRequest, AIResponse, AIUsage
@@ -983,3 +984,116 @@ async def test_openrouter_structured_output_compatibility_enforcement():
     assert "google/gemini-2.0-flash-001" in routed_models
     assert "meta-llama/llama-3.3-70b-instruct" in routed_models
     assert "unverified/arbitrary-model" not in routed_models
+
+# --- Groq Cloud Provider Tests ---
+
+
+def make_groq_response(
+    content: str = '{"category": "bug", "sentiment": "negative", "confidence": 0.95}',
+    model: str = "qwen/qwen3.8-27b",
+    status_code: int = 200,
+) -> httpx.Response:
+    return httpx.Response(
+        status_code=status_code,
+        json={
+            "id": "chatcmpl-test-groq",
+            "object": "chat.completion",
+            "created": 1700000000,
+            "model": model,
+            "choices": [
+                {
+                    "index": 0,
+                    "message": {
+                        "role": "assistant",
+                        "content": content,
+                    },
+                    "finish_reason": "stop",
+                }
+            ],
+            "usage": {
+                "prompt_tokens": 50,
+                "completion_tokens": 25,
+                "total_tokens": 75,
+            },
+        },
+    )
+
+
+@pytest.mark.anyio
+async def test_groq_provider_success_structured():
+    """Verify GroqProvider prepares payload with json_object format and parses response."""
+    captured_payload = {}
+
+    def handler(req: httpx.Request):
+        nonlocal captured_payload
+        captured_payload = json.loads(req.read())
+        return make_groq_response()
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    prov = GroqProvider(api_key="gsk_test123", client=client)
+
+    req = AIRequest(
+        prompt="Classify feedback",
+        system_instruction="System prompt",
+        response_schema=FeedbackCategoryModel,
+    )
+    resp = await prov.generate(req)
+
+    assert resp.provider == "groq"
+    assert resp.content.startswith("{")
+    assert resp.usage.total_tokens == 75
+    assert captured_payload["response_format"] == {"type": "json_object"}
+    assert "JSON schema" in captured_payload["messages"][0]["content"]
+
+
+@pytest.mark.anyio
+async def test_groq_provider_error_mapping():
+    """Verify GroqProvider properly maps 401, 429, and 500 status codes."""
+    prov = GroqProvider(api_key="gsk_test123")
+
+    # 401
+    resp_401 = httpx.Response(401, json={"error": {"message": "Invalid API Key", "code": "invalid_api_key"}}, request=httpx.Request("POST", "https://api.groq.com"))
+    err_401 = prov.map_http_error(httpx.HTTPStatusError("401", request=resp_401.request, response=resp_401))
+    assert isinstance(err_401, AIProviderAuthError)
+
+    # 429
+    resp_429 = httpx.Response(429, json={"error": {"message": "Rate limit reached"}}, request=httpx.Request("POST", "https://api.groq.com"))
+    err_429 = prov.map_http_error(httpx.HTTPStatusError("429", request=resp_429.request, response=resp_429))
+    assert isinstance(err_429, AIProviderRateLimitError)
+
+    # 503
+    resp_503 = httpx.Response(503, json={"error": {"message": "Service unavailable"}}, request=httpx.Request("POST", "https://api.groq.com"))
+    err_503 = prov.map_http_error(httpx.HTTPStatusError("503", request=resp_503.request, response=resp_503))
+    assert isinstance(err_503, AIProviderUnavailableError)
+
+
+@pytest.mark.anyio
+async def test_manager_fallback_to_groq():
+    """Verify AIProviderManager seamlessly falls back to Groq when Gemini and OpenRouter fail."""
+    def gemini_handler(req: httpx.Request):
+        return httpx.Response(503, json={"error": {"message": "High demand"}})
+
+    def openrouter_handler(req: httpx.Request):
+        return httpx.Response(402, json={"error": {"message": "Payment required"}})
+
+    def groq_handler(req: httpx.Request):
+        return make_groq_response()
+
+    gemini_client = httpx.AsyncClient(transport=httpx.MockTransport(gemini_handler))
+    openrouter_client = httpx.AsyncClient(transport=httpx.MockTransport(openrouter_handler))
+    groq_client = httpx.AsyncClient(transport=httpx.MockTransport(groq_handler))
+
+    manager = AIProviderManager(
+        providers={
+            "gemini": GeminiProvider(api_key="key1", client=gemini_client),
+            "openrouter": OpenRouterProvider(api_key="key2", client=openrouter_client),
+            "groq": GroqProvider(api_key="gsk_key3", client=groq_client),
+        },
+        priority_order=["gemini", "openrouter", "groq"],
+    )
+
+    req = AIRequest(prompt="Classify feedback", response_schema=FeedbackCategoryModel)
+    resp = await manager.generate(req)
+
+    assert resp.provider == "groq"
+    assert "bug" in resp.content

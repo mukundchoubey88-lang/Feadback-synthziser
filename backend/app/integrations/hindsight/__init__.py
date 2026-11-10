@@ -1,8 +1,10 @@
-"""Hindsight Persistent Memory integration placeholder.
+"""Hindsight Persistent Memory integration (Part 9).
 
-Architectural module reserved for Part 9 (Persistent Memory, Historical Reasoning, and Temporal Evolution).
-Hindsight serves as the cognitive memory layer alongside PostgreSQL as the structured source of truth.
-
-No mock client or invented endpoints are implemented here. Official Hindsight SDK/API integration
-will be implemented in Part 9 following official documentation and specifications.
+Cognitive memory layer alongside PostgreSQL as the structured source of truth.
+Provides asynchronous client for retaining, recalling, and reflecting upon
+historical customer feedback, themes, product changes, and synthesized insights.
 """
+
+from app.integrations.hindsight.client import HindsightClient
+
+__all__ = ["HindsightClient"]

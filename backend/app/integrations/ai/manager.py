@@ -26,6 +26,7 @@ from app.integrations.ai.exceptions import (
 )
 from app.integrations.ai.gemini import GeminiProvider
 from app.integrations.ai.grok import GrokProvider
+from app.integrations.ai.groq import GroqProvider
 from app.integrations.ai.openrouter import OpenRouterProvider
 from app.integrations.ai.schemas import AIRequest, AIResponse
 
@@ -69,6 +70,7 @@ class AIProviderManager:
                 "gemini": GeminiProvider(),
                 "openrouter": OpenRouterProvider(),
                 "grok": GrokProvider(),
+                "groq": GroqProvider(),
             }
 
     def register_provider(self, provider: BaseAIProvider) -> None:
@@ -85,6 +87,16 @@ class AIProviderManager:
         for prov_name in self.priority_order:
             name_key = prov_name.lower()
             provider = self._providers.get(name_key)
+            # Seamless fallback between grok and groq aliases
+            if (not provider or not provider.is_configured) and name_key == "grok":
+                alt_groq = self._providers.get("groq")
+                if alt_groq and alt_groq.is_configured:
+                    provider = alt_groq
+            elif (not provider or not provider.is_configured) and name_key == "groq":
+                alt_grok = self._providers.get("grok")
+                if alt_grok and alt_grok.is_configured:
+                    provider = alt_grok
+
             if provider:
                 candidates.append((name_key, provider))
         return candidates

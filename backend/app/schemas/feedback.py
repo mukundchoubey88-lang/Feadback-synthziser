@@ -131,3 +131,15 @@ class QualitySummaryResponse(BaseModel):
     pii_detected_count: int
     average_quality_score: float
     flag_distribution: Dict[str, int]
+
+
+class FeedbackCreateRequest(BaseModel):
+    """Payload for submitting an individual customer feedback item."""
+
+    product: str = Field(..., min_length=1, max_length=100, description="Product line or application name")
+    feedback_text: str = Field(..., min_length=1, description="Raw feedback text")
+    source: str = Field(default="in_app", max_length=100, description="Feedback source")
+    feature: Optional[str] = Field(default=None, max_length=100, description="Impacted feature or component")
+    app_version: Optional[str] = Field(default=None, max_length=50, description="Client or app version")
+    customer_id: Optional[str] = Field(default=None, max_length=255, description="External customer ID")
+    timestamp: Optional[datetime] = Field(default=None, description="Original feedback timestamp in UTC")

@@ -19,6 +19,7 @@ from app.integrations.ai.exceptions import (
 )
 from app.integrations.ai.gemini import GeminiProvider
 from app.integrations.ai.grok import GrokProvider
+from app.integrations.ai.groq import GroqProvider
 from app.integrations.ai.manager import AIProviderManager
 from app.integrations.ai.openrouter import OpenRouterProvider
 from app.integrations.ai.schemas import AIRequest, AIResponse, AIUsage
@@ -40,6 +41,7 @@ __all__ = [
     "BaseAIProvider",
     "GeminiProvider",
     "GrokProvider",
+    "GroqProvider",
     "OpenRouterProvider",
     "AIProviderManager",
 ]

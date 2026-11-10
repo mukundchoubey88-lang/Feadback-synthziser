@@ -9,6 +9,10 @@ from app.core.exceptions import AppException, app_exception_handler, generic_exc
 from app.api.routes.health import router as health_router
 from app.api.routes.feedback import router as feedback_router
 from app.api.routes.classification import router as classification_router
+from app.api.routes.themes import router as themes_router
+from app.api.routes.analytics import router as analytics_router
+from app.api.routes.memory import router as memory_router
+from app.api.routes.intelligence import router as intelligence_router
 from app.schemas.health import RootInfoResponse
 
 logger = logging.getLogger("app.main")
@@ -61,6 +65,26 @@ def create_app() -> FastAPI:
         classification_router,
         prefix=f"{settings.API_V1_PREFIX}/classifications",
         tags=["Classification"],
+    )
+    app.include_router(
+        themes_router,
+        prefix=f"{settings.API_V1_PREFIX}/themes",
+        tags=["Themes"],
+    )
+    app.include_router(
+        analytics_router,
+        prefix=f"{settings.API_V1_PREFIX}/analytics",
+        tags=["Analytics"],
+    )
+    app.include_router(
+        memory_router,
+        prefix=f"{settings.API_V1_PREFIX}/memory",
+        tags=["Memory"],
+    )
+    app.include_router(
+        intelligence_router,
+        prefix=f"{settings.API_V1_PREFIX}/intelligence",
+        tags=["Intelligence"],
     )
 
     # Root Endpoint

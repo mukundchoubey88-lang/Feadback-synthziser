@@ -1,3 +1,4 @@
+import json
 """Google Gemini AI Provider Implementation.
 
 Direct REST integration with Gemini v1beta generateContent API using httpx,
@@ -203,7 +204,19 @@ class GeminiProvider(BaseAIProvider):
         if request.response_schema is not None:
             generation_config["responseMimeType"] = "application/json"
             json_schema = request.response_schema.model_json_schema()
-            generation_config["responseSchema"] = json_schema
+            # Google's v1beta responseSchema does not support OpenAPI $defs/$ref.
+            # When $defs are present, inject the schema guidance into systemInstruction.
+            if "$defs" in json_schema or "definitions" in json_schema:
+                schema_str = json.dumps(json_schema)
+                instruction_text = (
+                    (request.system_instruction or "")
+                    + f"\n\nYou MUST return valid JSON adhering strictly to this schema:\n{schema_str}\nDo not include any explanation or markdown formatting."
+                ).strip()
+                payload["systemInstruction"] = {
+                    "parts": [{"text": instruction_text}]
+                }
+            else:
+                generation_config["responseSchema"] = json_schema
 
         payload["generationConfig"] = generation_config
         return payload

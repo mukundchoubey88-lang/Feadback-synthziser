@@ -18,7 +18,10 @@ from app.schemas.embedding import (
     BatchEmbeddingResponse,
     EmbeddingItemResult,
 )
+from app.models.feedback import Feedback
+from datetime import timezone
 from app.schemas.feedback import (
+    FeedbackCreateRequest,
     BatchCleanResponse,
     FeedbackPaginationResponse,
     FeedbackQualityResponse,
@@ -144,6 +147,35 @@ def list_feedback(
         page_size=page_size,
         total_pages=total_pages,
     )
+
+
+@router.post(
+    "",
+    response_model=FeedbackResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Submit Single Feedback Record",
+    description="Directly submit an individual customer feedback record.",
+)
+def create_feedback(
+    payload: FeedbackCreateRequest,
+    session: Session = Depends(get_db),
+) -> FeedbackResponse:
+    """Create single feedback item."""
+    fb = Feedback(
+        product=payload.product,
+        feedback_text=payload.feedback_text,
+        source=payload.source,
+        feature=payload.feature,
+        app_version=payload.app_version,
+        customer_id=payload.customer_id,
+        timestamp=payload.timestamp or datetime.now(timezone.utc),
+        quality_status="pending",
+        processing_status="unprocessed",
+    )
+    session.add(fb)
+    session.commit()
+    session.refresh(fb)
+    return FeedbackResponse.model_validate(fb)
 
 
 @router.get(

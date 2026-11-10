@@ -1,10 +1,23 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { client, formatScore, formatWhen } from "../../lib/api";
-import type { FeedbackPage as FeedbackPageType, FeedbackRecord, QualityInspection } from "../../lib/types";
+import type {
+  FeedbackClassificationDetail,
+  FeedbackPage as FeedbackPageType,
+  FeedbackRecord,
+  QualityInspection,
+} from "../../lib/types";
 import { Badge, Button, Input, Notice, Panel } from "./ui";
 
-const makeRecord = (partial: Partial<FeedbackRecord> & { feedback_id: string; feedback_text: string; product: string; source: string; quality_status: string }): FeedbackRecord => ({
+const makeRecord = (
+  partial: Partial<FeedbackRecord> & {
+    feedback_id: string;
+    feedback_text: string;
+    product: string;
+    source: string;
+    quality_status: string;
+  }
+): FeedbackRecord => ({
   customer_id: "cust-demo",
   feature: null,
   timestamp: "2026-11-07T14:30:00Z",
@@ -29,7 +42,8 @@ const fallbackItems: FeedbackRecord[] = [
   makeRecord({
     feedback_id: "fb-7382-d91a",
     customer_id: "cust-902",
-    feedback_text: "The new search filters on the analytics dashboard are 10x faster than last month. Really appreciate the keyboard shortcut support.",
+    feedback_text:
+      "The new search filters on the analytics dashboard are 10x faster than last month. Really appreciate the keyboard shortcut support.",
     product: "Analytics Portal",
     source: "in_app",
     quality_status: "clean",
@@ -37,7 +51,8 @@ const fallbackItems: FeedbackRecord[] = [
   makeRecord({
     feedback_id: "fb-7381-c42b",
     customer_id: "cust-481",
-    feedback_text: "Exporting raw feedback to CSV fails when filtering over 500 records. Webhook logs show gateway timeout 504.",
+    feedback_text:
+      "Exporting raw feedback to CSV fails when filtering over 500 records. Webhook logs show gateway timeout 504.",
     product: "Analytics Portal",
     source: "zendesk",
     quality_status: "clean",
@@ -45,7 +60,8 @@ const fallbackItems: FeedbackRecord[] = [
   makeRecord({
     feedback_id: "fb-7380-e88f",
     customer_id: "cust-129",
-    feedback_text: "Stripe recurring billing charged twice for the team seat upgrade. Support team was helpful but billing webhook needs attention.",
+    feedback_text:
+      "Stripe recurring billing charged twice for the team seat upgrade. Support team was helpful but billing webhook needs attention.",
     product: "Billing",
     source: "email",
     quality_status: "flagged",
@@ -53,7 +69,8 @@ const fallbackItems: FeedbackRecord[] = [
   makeRecord({
     feedback_id: "fb-7379-a110",
     customer_id: "cust-552",
-    feedback_text: "Love the automated theme discovery! It pinpointed our mobile onboarding drop-off immediately after the v2.4 launch.",
+    feedback_text:
+      "Love the automated theme discovery! It pinpointed our mobile onboarding drop-off immediately after the v2.4 launch.",
     product: "Mobile App",
     source: "app_store",
     quality_status: "clean",
@@ -61,7 +78,8 @@ const fallbackItems: FeedbackRecord[] = [
   makeRecord({
     feedback_id: "fb-7378-b394",
     customer_id: "cust-304",
-    feedback_text: "Please add dark mode support to the console and webhooks event payload preview.",
+    feedback_text:
+      "Please add dark mode support to the console and webhooks event payload preview.",
     product: "Developer Console",
     source: "slack",
     quality_status: "clean",
@@ -109,7 +127,8 @@ function getFallbackQuality(item: FeedbackRecord): QualityInspection {
     quality_score: item.quality_score ?? 0.94,
     content_quality_score: item.content_quality_score ?? 0.96,
     metadata_completeness_score: item.metadata_completeness_score ?? 0.92,
-    quality_flags: item.quality_flags ?? (item.quality_status === "flagged" ? ["sensitive_data"] : []),
+    quality_flags:
+      item.quality_flags ?? (item.quality_status === "flagged" ? ["sensitive_data"] : []),
     pii_detected: item.pii_detected,
     pii_types: item.pii_types,
     cleaning_version: "v1.2",
@@ -124,49 +143,68 @@ export function FeedbackPage() {
   const [list, setList] = useState<FeedbackPageType | null>(null);
   const [record, setRecord] = useState<FeedbackRecord | null>(null);
   const [quality, setQuality] = useState<QualityInspection | null>(null);
+  const [classification, setClassification] = useState<FeedbackClassificationDetail | null>(null);
   const [page, setPage] = useState(1);
   const [product, setProduct] = useState("");
   const [source, setSource] = useState("");
-  const [applied, setApplied] = useState<{ product: string; source: string }>({ product: "", source: "" });
+  const [applied, setApplied] = useState<{ product: string; source: string }>({
+    product: "",
+    source: "",
+  });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [classifying, setClassifying] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    setError(null);
+  // New feedback modal/form state
+  const [showCreate, setShowCreate] = useState(false);
+  const [newProduct, setNewProduct] = useState("Analytics Portal");
+  const [newSource, setNewSource] = useState("in_app");
+  const [newText, setNewText] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchRecords = () => {
     client
-      .feedback({ page, page_size: 12, product: applied.product || undefined, source: applied.source || undefined })
+      .feedback({
+        page,
+        page_size: 12,
+        product: applied.product || undefined,
+        source: applied.source || undefined,
+      })
       .then((value) => {
-        if (!cancelled) {
-          setList(value);
-        }
+        setList(value);
       })
       .catch(() => {
-        if (!cancelled) {
-          const uploaded = getUploadedRecords();
-          let items = uploaded.length > 0 ? [...uploaded, ...fallbackItems] : fallbackItems;
-          if (applied.product) {
-            items = items.filter((i) => i.product.toLowerCase().includes(applied.product.toLowerCase()));
-          }
-          if (applied.source) {
-            items = items.filter((i) => i.source.toLowerCase().includes(applied.source.toLowerCase()));
-          }
-          setList({ ...fallbackPage, items, total: items.length });
+        const uploaded = getUploadedRecords();
+        let items = uploaded.length > 0 ? [...uploaded, ...fallbackItems] : fallbackItems;
+        if (applied.product) {
+          items = items.filter((i) =>
+            i.product.toLowerCase().includes(applied.product.toLowerCase())
+          );
         }
+        if (applied.source) {
+          items = items.filter((i) =>
+            i.source.toLowerCase().includes(applied.source.toLowerCase())
+          );
+        }
+        setList({ ...fallbackPage, items, total: items.length });
       });
-    return () => {
-      cancelled = true;
-    };
+  };
+
+  useEffect(() => {
+    setError(null);
+    fetchRecords();
   }, [page, applied]);
 
   useEffect(() => {
     if (!feedbackId) {
       setRecord(null);
       setQuality(null);
+      setClassification(null);
       return;
     }
     let cancelled = false;
     setError(null);
+
     Promise.all([client.feedbackById(feedbackId), client.quality(feedbackId)])
       .then(([item, inspection]) => {
         if (cancelled) return;
@@ -177,18 +215,30 @@ export function FeedbackPage() {
         if (!cancelled) {
           const uploaded = getUploadedRecords();
           const all = [...uploaded, ...fallbackItems];
-          const item = all.find((i) => i.feedback_id === feedbackId) || makeRecord({
-            feedback_id: feedbackId,
-            customer_id: "cust-demo",
-            feedback_text: "Sample feedback record previewed in demo mode.",
-            product: "Platform",
-            source: "in_app",
-            quality_status: "clean",
-          });
+          const item =
+            all.find((i) => i.feedback_id === feedbackId) ||
+            makeRecord({
+              feedback_id: feedbackId,
+              customer_id: "cust-demo",
+              feedback_text: "Sample feedback record previewed in demo mode.",
+              product: "Platform",
+              source: "in_app",
+              quality_status: "clean",
+            });
           setRecord(item);
           setQuality(getFallbackQuality(item));
         }
       });
+
+    client
+      .classification(feedbackId)
+      .then((res) => {
+        if (!cancelled) setClassification(res);
+      })
+      .catch(() => {
+        if (!cancelled) setClassification(null);
+      });
+
     return () => {
       cancelled = true;
     };
@@ -215,19 +265,110 @@ export function FeedbackPage() {
     setBusy(false);
   }
 
+  async function classifyRecord() {
+    if (!feedbackId) return;
+    setClassifying(true);
+    setError(null);
+    try {
+      const res = await client.classifyOne(feedbackId, true);
+      setClassification(res);
+    } catch (err: any) {
+      setError(err?.message || "Classification failed. Check Gemini API configuration.");
+    } finally {
+      setClassifying(false);
+    }
+  }
+
+  async function handleCreateFeedback(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newText.trim() || !newProduct.trim()) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      await client.createFeedback({
+        product: newProduct.trim(),
+        feedback_text: newText.trim(),
+        source: newSource.trim() || "in_app",
+      });
+      setNewText("");
+      setShowCreate(false);
+      fetchRecords();
+    } catch (err: any) {
+      setError(err?.message || "Failed to submit feedback.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const sentimentVariant = (sentiment?: string | null): "good" | "bad" | "warn" | "neutral" => {
+    if (!sentiment) return "neutral";
+    const s = sentiment.toLowerCase();
+    if (s === "positive") return "good";
+    if (s === "negative") return "bad";
+    if (s === "mixed") return "warn";
+    return "neutral";
+  };
+
   return (
     <div className="grid gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <p className="text-[12px] tracking-[0.16em] text-mute uppercase">Feedback</p>
-            
           </div>
-          <h1 className="mt-2 text-[36px] leading-none tracking-[-0.045em]">Records stored by the API.</h1>
+          <h1 className="mt-2 text-[36px] leading-none tracking-[-0.045em]">
+            Records stored by the API.
+          </h1>
         </div>
+        <Button variant="primary" size="md" onClick={() => setShowCreate(!showCreate)}>
+          {showCreate ? "Cancel" : "+ Submit Feedback"}
+        </Button>
       </div>
 
-
+      {showCreate && (
+        <Panel title="Submit New Customer Feedback">
+          <form className="grid gap-4" onSubmit={handleCreateFeedback}>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <label className="grid gap-1 text-[12px] text-mute">
+                Product Name *
+                <Input
+                  value={newProduct}
+                  onChange={(e) => setNewProduct(e.target.value)}
+                  placeholder="e.g. Analytics Portal"
+                  required
+                />
+              </label>
+              <label className="grid gap-1 text-[12px] text-mute">
+                Source
+                <Input
+                  value={newSource}
+                  onChange={(e) => setNewSource(e.target.value)}
+                  placeholder="e.g. in_app, zendesk, slack"
+                />
+              </label>
+            </div>
+            <label className="grid gap-1 text-[12px] text-mute">
+              Feedback Text *
+              <textarea
+                value={newText}
+                onChange={(e) => setNewText(e.target.value)}
+                placeholder="Enter customer feedback text..."
+                rows={3}
+                required
+                className="w-full border border-line bg-sheet px-3 py-2 text-[14px] text-ink focus:border-accent focus:outline-none"
+              />
+            </label>
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="secondary" onClick={() => setShowCreate(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary" busy={submitting}>
+                {submitting ? "Ingesting…" : "Save Record"}
+              </Button>
+            </div>
+          </form>
+        </Panel>
+      )}
 
       {error && <Notice tone="bad">{error}</Notice>}
 
@@ -265,19 +406,40 @@ export function FeedbackPage() {
           <ul className="grid gap-3">
             {list?.items.map((item) => (
               <li key={item.feedback_id}>
-                <Link to={`/console/feedback/${item.feedback_id}`} className="block hover:text-accent">
+                <Link
+                  to={`/console/feedback/${item.feedback_id}`}
+                  className={`block p-2 rounded transition-colors hover:text-accent ${
+                    item.feedback_id === feedbackId ? "bg-accent/10 border-l-2 border-accent" : ""
+                  }`}
+                >
                   <span className="line-clamp-2 text-[14px]">{item.feedback_text}</span>
                   <span className="mt-1 block text-[12px] text-mute">
-                    {item.product} · {item.source} · <Badge variant={item.quality_status === "clean" ? "good" : "warn"} mono className="text-[10px]">{item.quality_status}</Badge> · {formatWhen(item.timestamp)}
+                    {item.product} · {item.source} ·{" "}
+                    <Badge
+                      variant={item.quality_status === "clean" ? "good" : "warn"}
+                      mono
+                      className="text-[10px]"
+                    >
+                      {item.quality_status}
+                    </Badge>{" "}
+                    · {formatWhen(item.timestamp)}
                   </span>
                 </Link>
               </li>
             ))}
-            {list && list.items.length === 0 && <li className="text-[13px] text-mute">No records match.</li>}
+            {list && list.items.length === 0 && (
+              <li className="text-[13px] text-mute">No records match.</li>
+            )}
           </ul>
           {list && list.total_pages > 1 && (
             <div className="mt-4 flex items-center gap-3 text-[13px]">
-              <Button type="button" variant="secondary" size="sm" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={page <= 1}
+                onClick={() => setPage((value) => value - 1)}
+              >
                 Previous
               </Button>
               <span className="font-mono text-[12px] text-mute">
@@ -300,35 +462,159 @@ export function FeedbackPage() {
           {record && quality ? (
             <div className="grid gap-4 text-[14px]">
               <p className="font-mono text-[11px] text-mute">UUID: {record.feedback_id}</p>
-              <p className="leading-relaxed bg-sheet p-3 border border-line">{quality.original_feedback_text}</p>
+              <p className="leading-relaxed bg-sheet p-3 border border-line">
+                {quality.original_feedback_text}
+              </p>
               <div className="text-[13px] leading-relaxed text-ink-soft">
-                <span className="text-[11px] uppercase tracking-wider text-mute block mb-1">Cleaned Copy</span>
-                <p className="bg-sheet/50 p-3 border border-line">{quality.cleaned_feedback_text ?? "Not cleaned yet"}</p>
+                <span className="text-[11px] uppercase tracking-wider text-mute block mb-1">
+                  Cleaned Copy
+                </span>
+                <p className="bg-sheet/50 p-3 border border-line">
+                  {quality.cleaned_feedback_text ?? "Not cleaned yet"}
+                </p>
               </div>
+
+              {/* Classification & Sentiment Intelligence */}
+              <div className="border border-line bg-sheet/40 p-3.5 rounded">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-accent">
+                    AI Classification & Sentiment
+                  </span>
+                  {classification && (
+                    <Badge variant="neutral" mono className="text-[10px]">
+                      run #{classification.run_number}
+                    </Badge>
+                  )}
+                </div>
+
+                {classification ? (
+                  <div className="grid gap-2.5 text-[13px]">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-mute text-[12px]">Sentiment:</span>
+                      <Badge variant={sentimentVariant(classification.overall_sentiment)} mono>
+                        {classification.overall_sentiment}
+                      </Badge>
+                      <span className="font-mono text-[11px] text-mute">
+                        Score: {classification.sentiment_score?.toFixed(2)} ({classification.sentiment_intensity})
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-mute text-[12px]">Customer Intent:</span>
+                      <Badge variant="accent" mono>
+                        {classification.customer_intent}
+                      </Badge>
+                      <span className="text-mute text-[11px]">
+                        Confidence: {(classification.confidence_score * 100).toFixed(0)}%
+                      </span>
+                    </div>
+
+                    {classification.pain_points && classification.pain_points.length > 0 && (
+                      <div className="mt-1">
+                        <span className="text-[11px] text-mute block mb-1">Identified Pain Points:</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {classification.pain_points.map((pt, i) => (
+                            <span
+                              key={i}
+                              className="bg-bad/10 text-bad border border-bad/30 px-2 py-0.5 rounded text-[11px]"
+                            >
+                              {pt}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {classification.aspects && classification.aspects.length > 0 && (
+                      <div className="mt-1">
+                        <span className="text-[11px] text-mute block mb-1">Aspect Breakdown:</span>
+                        <div className="grid gap-1">
+                          {classification.aspects.map((asp, i) => (
+                            <div
+                              key={i}
+                              className="flex items-center justify-between text-[11px] bg-paper-deep/60 px-2 py-1 rounded"
+                            >
+                              <span className="font-medium text-ink">{asp.aspect}</span>
+                              <div className="flex items-center gap-2">
+                                <Badge variant={sentimentVariant(asp.sentiment)} mono className="text-[10px]">
+                                  {asp.sentiment}
+                                </Badge>
+                                <span className="text-mute font-mono">{asp.sentiment_score.toFixed(1)}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-[12px] text-mute py-1">
+                    <p className="mb-2">No classification recorded for this item.</p>
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      onClick={() => void classifyRecord()}
+                      busy={classifying}
+                    >
+                      {classifying ? "Classifying with Gemini…" : "Classify with AI"}
+                    </Button>
+                  </div>
+                )}
+              </div>
+
               <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-[13px] border-t border-line pt-3">
                 <dt className="text-mute">Quality Status</dt>
                 <dd>
                   <Badge variant={quality.quality_status === "clean" ? "good" : "warn"} mono>
                     {quality.quality_status}
-                  </Badge> · {formatScore(quality.quality_score)}
+                  </Badge>{" "}
+                  · {formatScore(quality.quality_score)}
                 </dd>
                 <dt className="text-mute">Content Score</dt>
                 <dd className="font-mono">{formatScore(quality.content_quality_score)}</dd>
                 <dt className="text-mute">Metadata Score</dt>
                 <dd className="font-mono">{formatScore(quality.metadata_completeness_score)}</dd>
                 <dt className="text-mute">PII Detected</dt>
-                <dd>{record.pii_detected ? (record.pii_types ?? []).join(", ") : "None detected"}</dd>
+                <dd>
+                  {record.pii_detected
+                    ? (record.pii_types ?? []).join(", ")
+                    : "None detected"}
+                </dd>
                 <dt className="text-mute">Flags</dt>
                 <dd>{quality.quality_flags?.join(", ") || "—"}</dd>
                 <dt className="text-mute">Processing Status</dt>
                 <dd className="font-mono capitalize">{record.processing_status}</dd>
               </dl>
-              <Button type="button" variant="primary" onClick={() => void cleanRecord()} busy={busy} className="w-fit">
-                {busy ? "Cleaning…" : "Run cleaning on this record"}
-              </Button>
+
+              <div className="flex flex-wrap gap-2 pt-1">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => void cleanRecord()}
+                  busy={busy}
+                  className="w-fit"
+                >
+                  {busy ? "Cleaning…" : "Run cleaning"}
+                </Button>
+                {classification && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => void classifyRecord()}
+                    busy={classifying}
+                    className="w-fit"
+                  >
+                    {classifying ? "Re-classifying…" : "Re-run classification"}
+                  </Button>
+                )}
+              </div>
             </div>
           ) : (
-            <p className="text-[13px] text-mute">Select a record to inspect the original text, cleaned copy, and quality scores.</p>
+            <p className="text-[13px] text-mute">
+              Select a record to inspect the original text, cleaned copy, quality scores, and AI
+              classification.
+            </p>
           )}
         </Panel>
       </div>
